@@ -1,0 +1,9 @@
+author: Scriblon
+database: false
+description: Extension on PreciousStones. Adding upkeep cost in form of a configurable
+  item.
+generator: http://dinnerbone.com/minecraft/tools/pluginator/
+main: me.scriblon.plugins.expensivestones.Expensivestones
+name: ExpensiveStones
+startup: postworld
+version: '0.1'
