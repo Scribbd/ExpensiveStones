@@ -13,47 +13,28 @@
  *You should have received a copy of the GNU General Public License
  *along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.scriblon.plugins.expensivestones.configurators;
+package me.scriblon.plugins.expensivestones.utils;
 
-import com.avaje.ebean.EbeanServer;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
-import org.bukkit.plugin.PluginManager;
+import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
+import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;
+import net.sacredlabyrinth.Phaed.PreciousStones.storage.MySQLCore;
+import net.sacredlabyrinth.Phaed.PreciousStones.storage.SQLiteCore;
 
 /**
- * Class dedicated to configure PreciousStone on startup.
+ * To create a copy of the datacore available in preciousstones
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
-public class Configurator {
+public class DBFactory {
     
-    private PluginManager pm;
-    private PreciousStones stones;
-    private EbeanServer db;
-    
-    public Configurator(PluginManager pm){
-        this.pm = pm;
-        stones = PreciousStones.getInstance();
-        db = stones.getDatabase();
-    }
-    
-    public boolean isPSAvailable(){
-        return pm.getPlugin("PreciousStones") == null;
-    }
-    
-    public PreciousStones getPS(){
-        return stones;
-    }
-    
-    public boolean configureFields(){
+    public static DBCore produceDB(){
+        PreciousStones stones = PreciousStones.getInstance();
+        SettingsManager pSettings = stones.getSettingsManager();
         
-        return false;
-    }
-    
-    public void addTables(){
-        
-    }
-    
-    public boolean tablesAvailable(){
-        
-        return false;
+        if(pSettings.isUseMysql()){
+            return new MySQLCore(pSettings.getHost(), pSettings.getPort(), pSettings.getDatabase(), pSettings.getUsername(), pSettings.getPassword());
+        }else{
+            return new SQLiteCore("PreciousStones", stones.getDataFolder().getPath());
+        }
     }
 }

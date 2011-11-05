@@ -15,6 +15,7 @@
  */
 package me.scriblon.plugins.expensivestones.configurators;
 
+import me.scriblon.plugins.expensivestones.utils.DBFactory;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;
 
@@ -24,11 +25,23 @@ import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;
  */
 public class ESStorageManager {
     
+    public static final int ES_ENABLED = 0;
+    public static final int ES_DISABLED = 1;
+    public static final int ES_ADMIN = 2;
+    
     private PreciousStones stones;
-    private final DBCore db;
+    private DBCore db;
     
     public ESStorageManager(){
         stones = PreciousStones.getInstance();
-        db = stones.getStorageManager().core;
-    }   
+        db = DBFactory.produceDB();
+    }
+    
+    public boolean isUpgraded(){
+        return db.existsTable("exstones_disabled");
+    }
+    
+    public void upgradeDatabase(){
+        db.execute("CREATE TABLE IF NOT EXISTS `exstones_disabled' ('id' bigint(20) NOT NULL, 'disabled' tinyint NOT NULL default 0, CONSTRAINT pk_exst_dis PRIMARY KEY ('id'), CONSTRAINT fk_extdis_)");
+    }
 }
