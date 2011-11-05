@@ -15,10 +15,20 @@
  */
 package me.scriblon.plugins.expensivestones.configurators;
 
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;
+
 /**
  * Hooks up with the PreciousStone storage mechanism and makes transfers possible.
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class ESStorageManager {
     
+    private PreciousStones stones;
+    private final DBCore db;
+    
+    public ESStorageManager(){
+        stones = PreciousStones.getInstance();
+        db = stones.getStorageManager().core;
+    }   
 }

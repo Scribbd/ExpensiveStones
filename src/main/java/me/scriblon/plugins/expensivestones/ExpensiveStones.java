@@ -19,6 +19,7 @@ package me.scriblon.plugins.expensivestones;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.scriblon.plugins.expensivestones.configurators.Configurator;
 import me.scriblon.plugins.expensivestones.listeners.ESBlockListener;
 import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
 import org.bukkit.command.Command;
@@ -36,27 +37,29 @@ public class ExpensiveStones extends JavaPlugin {
     private ESCommandExecutor esCommandEx;
     
     public void onDisable() {
-        infoLog("is now dissabled!");
+        infoLog("is now disabled!");
     }
 
     public void onEnable() {
         infoLog("Starting to load!");
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
-        // initialize listeners
-        
-
+        // Control dependencies
+        Configurator config = new Configurator(pm);
+        if(!config.isPSAvailable()){
+            infoLog("PreciousStones not available, disabling plugin!");
+            pm.disablePlugin(this);
+            return;
+        }
+        // Initialize listeners and executors
+        esBlockListener = new ESBlockListener();
+        esCommandEx = new ESCommandExecutor();
+        //Register
         this.registerEvents(pm);
-        
         this.registerCommands();
-        
+        // Conclude
         infoLog("Load was succesfull!");
-        
     }
-
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        return false;
-    } 
     
     private void registerEvents(PluginManager pm){
         pm.registerEvent(Type.BLOCK_PLACE, esBlockListener, Priority.Highest, this);

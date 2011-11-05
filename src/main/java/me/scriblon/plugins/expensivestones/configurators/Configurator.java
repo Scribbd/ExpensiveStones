@@ -25,9 +25,11 @@ import org.bukkit.plugin.PluginManager;
 public class Configurator {
     
     private PluginManager pm;
+    private PreciousStones stones;
     
     public Configurator(PluginManager pm){
         this.pm = pm;
+        stones = PreciousStones.getInstance();
     }
     
     public boolean isPSAvailable(){
@@ -35,10 +37,20 @@ public class Configurator {
     }
     
     public PreciousStones getPS(){
-        return PreciousStones.getInstance();
+        return stones;
     }
     
     public boolean configureFields(){
+        
+        return false;
+    }
+    
+    public void addTables(){
+        
+    }
+    
+    public boolean tablesAvailable(){
+        
         return false;
     }
 }
