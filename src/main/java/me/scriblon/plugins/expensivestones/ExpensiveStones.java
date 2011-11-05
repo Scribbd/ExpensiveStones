@@ -16,23 +16,59 @@
 
 package me.scriblon.plugins.expensivestones;
 
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import me.scriblon.plugins.expensivestones.listeners.ESBlockListener;
+import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ExpensiveStones extends JavaPlugin {
+    private final String prefix =  "[" + getDescription().getFullName() + "] ";
+    private final Logger log = this.getServer().getLogger();
+    
+    private ESBlockListener esBlockListener;
+    private ESCommandExecutor esCommandEx;
+    
     public void onDisable() {
-        // TODO: Place any custom disable code here.
-        System.out.println(this + " is now disabled!");
+        infoLog("is now dissabled!");
     }
 
     public void onEnable() {
-        // TODO: Place any custom enable code here, such as registering events
+        infoLog("Starting to load!");
+        // Get basic information
+        final PluginManager pm = this.getServer().getPluginManager();
+        // initialize listeners
         
-        System.out.println(this + " is now enabled!");
+
+        this.registerEvents(pm);
+        
+        this.registerCommands();
+        
+        infoLog("Load was succesfull!");
+        
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         return false;
     } 
+    
+    private void registerEvents(PluginManager pm){
+        pm.registerEvent(Type.BLOCK_PLACE, esBlockListener, Priority.Highest, this);
+        pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Highest, this);
+        pm.registerEvent(Type.SIGN_CHANGE, esBlockListener, Priority.Normal, this);
+    }
+    
+    private void registerCommands(){
+        this.getCommand("es").setExecutor(esCommandEx);
+    }
+    
+    private void infoLog(String Message){
+        log.log(Level.INFO, new StringBuilder().append(prefix).append(Message).toString());
+    }
 }

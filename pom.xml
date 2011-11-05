@@ -31,5 +31,10 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>PreciousStones</groupId>
+            <artifactId>org.PreciousStones</artifactId>
+            <version>7.0.4</version>
+        </dependency>
     </dependencies>
 </project>

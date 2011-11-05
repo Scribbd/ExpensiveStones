@@ -15,10 +15,39 @@
  */
 package me.scriblon.plugins.expensivestones.listeners;
 
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockListener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
+
 /**
- *
+ * ExpensiveStones Listener for sign place event and the placing of FieldBlocks
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
-public class FieldDisabler {
+public class ESBlockListener extends BlockListener{
     
+
+    
+    
+    @Override
+    public void onSignChange(SignChangeEvent event) {
+        if(event.isCancelled())
+            return;
+        
+    }
+
+    @Override
+    public void onBlockBreak(BlockBreakEvent event) {
+        if(event.isCancelled())
+            return;
+    }
+
+    @Override
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if(event.isCancelled())
+            return;
+    }
+    
+    
+
 }

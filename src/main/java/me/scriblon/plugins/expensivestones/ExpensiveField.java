@@ -15,10 +15,32 @@
  */
 package me.scriblon.plugins.expensivestones;
 
+import javax.lang.model.type.UnknownTypeException;
+import me.scriblon.plugins.expensivestones.utils.BlockUtil;
+import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
+import org.bukkit.block.Block;
+
 /**
- *
+ * A class deciated to the ExpensiveField combo. Which is a fieldblock, a chest and a sign.
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class ExpensiveField {
     
+    private Block sign;
+    private Block chest;
+    private Field field;
+    
+    private ExpensiveField(Block sign, Block chest, Field field) throws UnknownTypeException{
+        if(BlockUtil.isSign(sign))
+            this.sign = sign;
+        else
+            throw new UnknownTypeException(null, "Type is geen Sign-type");
+   
+        if(BlockUtil.isChest(chest))
+            this.chest = chest;
+        else
+            throw new UnknownTypeException(null, "Type is geen chest-type");
+        
+        this.field = field;
+    }
 }

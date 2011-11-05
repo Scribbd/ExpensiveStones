@@ -13,12 +13,32 @@
  *You should have received a copy of the GNU General Public License
  *along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.scriblon.plugins.expensivestones.listeners;
+package me.scriblon.plugins.expensivestones.configurators;
+
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import org.bukkit.plugin.PluginManager;
 
 /**
- *
+ * Class dedicated to configure PreciousStone on startup.
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
-public class RedstoneBlocker {
+public class Configurator {
     
+    private PluginManager pm;
+    
+    public Configurator(PluginManager pm){
+        this.pm = pm;
+    }
+    
+    public boolean isPSAvailable(){
+        return pm.getPlugin("PreciousStones") == null;
+    }
+    
+    public PreciousStones getPS(){
+        return PreciousStones.getInstance();
+    }
+    
+    public boolean configureFields(){
+        return false;
+    }
 }
