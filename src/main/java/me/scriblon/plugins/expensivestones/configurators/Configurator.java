@@ -16,7 +16,11 @@
 package me.scriblon.plugins.expensivestones.configurators;
 
 import com.avaje.ebean.EbeanServer;
+import java.util.LinkedList;
+import java.util.List;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 
 /**
@@ -43,17 +47,15 @@ public class Configurator {
         return stones;
     }
     
-    public boolean configureFields(){
+    public List<String> getConfiguredFields(){
+        List<String> configured = new LinkedList<String>();
+        SettingsManager psSettings = stones.getSettingsManager();
+        FileConfiguration config = stones.getConfig();
         
-        return false;
-    }
-    
-    public void addTables(){
+        //psSettings.
         
-    }
-    
-    public boolean tablesAvailable(){
+        //config.
         
-        return false;
+        return configured;
     }
 }
