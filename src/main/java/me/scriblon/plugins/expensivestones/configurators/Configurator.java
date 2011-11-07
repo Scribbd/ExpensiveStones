@@ -16,6 +16,8 @@
 package me.scriblon.plugins.expensivestones.configurators;
 
 import com.avaje.ebean.EbeanServer;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
@@ -47,15 +49,30 @@ public class Configurator {
         return stones;
     }
     
-    public List<String> getConfiguredFields(){
-        List<String> configured = new LinkedList<String>();
+    /**
+     * Get List of integers (blockids) which has the expensiveField-tag
+     * Might consider using own config.yml file and configure it there. But what is the fun in that ;)
+     * @return 
+     */
+    public List<Integer> getConfiguredFields(){
+        List<Integer> configured = new LinkedList<Integer>();
         SettingsManager psSettings = stones.getSettingsManager();
         FileConfiguration config = stones.getConfig();
-        
-        //psSettings.
-        
-        //config.
-        
+        //Get settings from PreciousStones
+        List<LinkedHashMap<String, Object>> forceFieldStones = psSettings.getForeceFieldBlocks();
+        for(LinkedHashMap<String, Object> stone : forceFieldStones){
+            if(stone.containsKey("block") && stone.containsKey("ExpensiveField")){
+                if(psSettings.isFieldType((Integer) stone.get("block")) && isBoolean(stone.get("ExpensiveField"))){
+                    configured.add((Integer) stone.get("block"));
+                }
+            }
+        }
         return configured;
+    }
+    
+    private boolean isBoolean(Object o){
+        if(o instanceof Boolean)
+            return (Boolean) o;
+        return false;
     }
 }
