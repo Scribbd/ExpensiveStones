@@ -19,7 +19,7 @@ package me.scriblon.plugins.expensivestones;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import me.scriblon.plugins.expensivestones.configurators.Configurator;
+import me.scriblon.plugins.expensivestones.managers.Configurator;
 import me.scriblon.plugins.expensivestones.listeners.ESBlockListener;
 import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
 import org.bukkit.command.Command;
@@ -45,12 +45,14 @@ public class ExpensiveStones extends JavaPlugin {
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
         // Control dependencies
-        Configurator config = new Configurator(pm);
+        Configurator config = new Configurator(pm, log);
         if(!config.isPSAvailable()){
             infoLog("PreciousStones not available, disabling plugin!");
             pm.disablePlugin(this);
             return;
         }
+        //Do the configuration
+        config.configureStones();
         // Initialize listeners and executors
         esBlockListener = new ESBlockListener();
         esCommandEx = new ESCommandExecutor();
