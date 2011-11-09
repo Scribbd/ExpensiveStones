@@ -17,6 +17,7 @@ package me.scriblon.plugins.expensivestones.tasks;
 
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 /**
@@ -25,12 +26,14 @@ import org.bukkit.scheduler.BukkitScheduler;
  */
 public class UpKeeper implements Runnable{
     
+    private JavaPlugin plugin;
     private ExpensiveField field;
     private BukkitScheduler scheduler;
     
-    public UpKeeper(ExpensiveField field, BukkitScheduler scheduler){
+    public UpKeeper(JavaPlugin plugin, ExpensiveField field, BukkitScheduler scheduler){
         this.field = field;
         this.scheduler = scheduler;
+        this.plugin = plugin;
     }
     
     public void run() {
@@ -38,7 +41,7 @@ public class UpKeeper implements Runnable{
         if(field.chestHasReqContent()){
             //Substract if available
             field.getChest().getInventory().remove(field.getUpkeepStack());
-            scheduler.scheduleSyncDelayedTask(ExpensiveStones.getInstance(), new UpKeeper(field, scheduler), field.getUpkeepPeriod());
+            //scheduler.scheduleSyncDelayedTask(ExpensiveStones.getInstance(), new UpKeeper(field, scheduler), field.getUpkeepPeriod());
         }else{
             
         }
