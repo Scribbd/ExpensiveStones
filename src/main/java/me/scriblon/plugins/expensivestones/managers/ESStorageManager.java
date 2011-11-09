@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
+import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.utils.DBFactory;
 import me.scriblon.plugins.expensivestones.utils.Helper;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
@@ -44,10 +45,10 @@ public class ESStorageManager {
     
     private final List<ExpensiveField> pending = Collections.synchronizedList(new LinkedList());;
     
-    public ESStorageManager(Logger log){
+    public ESStorageManager(){
         stones = PreciousStones.getInstance();
         db = DBFactory.produceDB();
-        this.log = log;
+        log = ExpensiveStones.getLogger();
     }
     
         /**

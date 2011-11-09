@@ -15,11 +15,17 @@
  */
 package me.scriblon.plugins.expensivestones.managers;
 
-import com.avaje.ebean.EbeanServer;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.scriblon.plugins.expensivestones.ExpensiveField;
+import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  * Class dedicated to configure PreciousStone on startup.
@@ -28,22 +34,27 @@ import org.bukkit.plugin.PluginManager;
 public class Configurator {
     
     private PluginManager pm;
+    private BukkitScheduler schedule;
     private PreciousStones stones;
-    private EbeanServer db;
+    private ExpensiveStones plugin;
+    
     private Logger log;
     private ESStorageManager storageManager;
     private ESFieldManager fieldManager;
     
-    public Configurator(PluginManager pm, Logger log){
+    public Configurator(PluginManager pm, BukkitScheduler schedule){
         this.pm = pm;
+        this.schedule = schedule;
         stones = PreciousStones.getInstance();
-        db = stones.getDatabase();
-        this.log = log;
-        storageManager = new ESStorageManager(log);
+        log = ExpensiveStones.getLogger();
+        storageManager = new ESStorageManager();
+        plugin = ExpensiveStones.getInstance();
     }
     
     /**
      * Main method to configure ExpensiveStones
+     * Loading progress
+     * PS-Load>ES-check>ES-modify>ES-Schedule
      */
     public void configureStones(){
         //Check and add if tables are present
@@ -60,8 +71,14 @@ public class Configurator {
             logInfo("Disable-table pressent");
         }
         //Get data from disabled-field to match other tables
+        List<ExpensiveField> fields = Collections.synchronizedList(new LinkedList<ExpensiveField>());
         
         //Get data from backup-field for immediate processing
+        
+        //Schedule Tasks
+        for(ExpensiveField field : fields){
+            schedule.scheduleSyncDelayedTask(plugin, new UpKeeper(field, schedule));
+        }
     }
     
     

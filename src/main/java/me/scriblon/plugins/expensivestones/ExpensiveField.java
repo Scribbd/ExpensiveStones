@@ -18,29 +18,74 @@ package me.scriblon.plugins.expensivestones;
 import javax.lang.model.type.UnknownTypeException;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * A class deciated to the ExpensiveField combo. Which is a fieldblock, a chest and a sign.
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class ExpensiveField {
-    
+    // basics
     private Block sign;
-    private Block chest;
+    private Chest chest;
     private Field field;
+    // extended
+    private int upkeepCost;
+    private long upkeepPeriod;
+    private Material upkeepMaterial;
     
-    private ExpensiveField(Block sign, Block chest, Field field) throws UnknownTypeException{
-        if(BlockUtil.isSign(sign))
+    public ExpensiveField(Block sign, Block chest, Field field, long upkeepPeriod) throws UnknownTypeException{
+        if(isCorrectValues(sign, chest)){
             this.sign = sign;
+            this.chest = (Chest) chest;
+            this.field = field;
+            this.upkeepPeriod = upkeepPeriod;
+        }
+    }
+    
+    public boolean chestHasReqContent(){
+        return chest.getInventory().contains(upkeepMaterial);
+    }
+    
+    public long getUpkeepPeriod(){
+        return upkeepPeriod;
+    }
+
+    public Chest getChest() {
+        return chest;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public Block getSign() {
+        return sign;
+    }
+
+    public Material getUpkeepMaterial() {
+        return upkeepMaterial;
+    }
+
+    public ItemStack getUpkeepStack(){
+        return new ItemStack(upkeepMaterial, upkeepCost);
+    }
+
+    public void setSign(Block sign) {
+        this.sign = sign;
+    }
+    
+    private boolean isCorrectValues(Block sign, Block chest) throws UnknownTypeException{
+        if(BlockUtil.isSign(sign)){
+            if(BlockUtil.isChest(chest))
+                return true;
+            else
+                throw new UnknownTypeException(null, "Type is geen chest-type"); 
+        }
         else
             throw new UnknownTypeException(null, "Type is geen Sign-type");
-   
-        if(BlockUtil.isChest(chest))
-            this.chest = chest;
-        else
-            throw new UnknownTypeException(null, "Type is geen chest-type");
-        
-        this.field = field;
     }
 }

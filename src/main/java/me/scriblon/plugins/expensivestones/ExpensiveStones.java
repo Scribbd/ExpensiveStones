@@ -16,22 +16,23 @@
 
 package me.scriblon.plugins.expensivestones;
 
-import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.scriblon.plugins.expensivestones.managers.Configurator;
 import me.scriblon.plugins.expensivestones.listeners.ESBlockListener;
 import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 public class ExpensiveStones extends JavaPlugin {
     private final String prefix =  "[" + getDescription().getFullName() + "] ";
-    private final Logger log = this.getServer().getLogger();
+    private static final Logger log = Logger.getLogger("Minecraft");
+    
+    private static ExpensiveStones expStones;
     
     private ESBlockListener esBlockListener;
     private ESCommandExecutor esCommandEx;
@@ -42,10 +43,12 @@ public class ExpensiveStones extends JavaPlugin {
 
     public void onEnable() {
         infoLog("Starting to load!");
+        expStones = this;
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
+        final BukkitScheduler scheduler = this.getServer().getScheduler();
         // Control dependencies
-        Configurator config = new Configurator(pm, log);
+        Configurator config = new Configurator(pm, scheduler);
         if(!config.isPSAvailable()){
             infoLog("PreciousStones not available, disabling plugin!");
             pm.disablePlugin(this);
@@ -75,5 +78,13 @@ public class ExpensiveStones extends JavaPlugin {
     
     private void infoLog(String Message){
         log.log(Level.INFO, new StringBuilder().append(prefix).append(Message).toString());
+    }
+    
+    public static Logger getLogger(){
+        return log;
+    }
+    
+    public static ExpensiveStones getInstance(){
+        return expStones;
     }
 }
