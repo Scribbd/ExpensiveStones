@@ -77,7 +77,8 @@ public class Configurator {
         
         //Schedule Tasks
         for(ExpensiveField field : fields){
-            schedule.scheduleSyncDelayedTask(plugin, new UpKeeper(field, schedule));
+            UpKeeper keeper = new UpKeeper(field);
+            keeper.scheduleThis();
         }
     }
     

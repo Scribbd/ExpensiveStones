@@ -15,6 +15,9 @@
  */
 package me.scriblon.plugins.expensivestones.managers;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 
 /**
@@ -25,10 +28,15 @@ public class ESFieldManager {
     
     private PreciousStones stones;
     
+    private Map<Integer, Long> upkeepIntervals = Collections.synchronizedMap(new LinkedHashMap<Integer, Long>());
+    
     public ESFieldManager(){
         stones = PreciousStones.getInstance();
     }
     
-    
-    
+    public long getUpkeepInterval(int blockId){
+        if(upkeepIntervals.containsKey(blockId))
+            return upkeepIntervals.get(blockId);
+        return 600L;
+    }
 }

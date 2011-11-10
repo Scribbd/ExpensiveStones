@@ -16,11 +16,13 @@
 package me.scriblon.plugins.expensivestones;
 
 import javax.lang.model.type.UnknownTypeException;
+import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.block.Sign;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -29,25 +31,22 @@ import org.bukkit.inventory.ItemStack;
  */
 public class ExpensiveField {
     // basics
-    private Block sign;
+    private Sign sign;
     private Chest chest;
     private Field field;
     // extended
     private int upkeepCost;
     private long upkeepPeriod;
     private Material upkeepMaterial;
+    private ESFieldManager esFieldManager;
     
-    public ExpensiveField(Block sign, Block chest, Field field, long upkeepPeriod) throws UnknownTypeException{
+    public ExpensiveField(Block sign, Block chest, Field field) throws UnknownTypeException{
         if(isCorrectValues(sign, chest)){
-            this.sign = sign;
+            this.sign = (Sign) sign;
             this.chest = (Chest) chest;
             this.field = field;
-            this.upkeepPeriod = upkeepPeriod;
+            //TODO figure efficient way to get upkeepMaterial, amount and cost
         }
-    }
-    
-    public boolean chestHasReqContent(){
-        return chest.getInventory().contains(upkeepMaterial);
     }
     
     public long getUpkeepPeriod(){
@@ -62,7 +61,7 @@ public class ExpensiveField {
         return field;
     }
 
-    public Block getSign() {
+    public Sign getSign() {
         return sign;
     }
 
@@ -73,11 +72,48 @@ public class ExpensiveField {
     public ItemStack getUpkeepStack(){
         return new ItemStack(upkeepMaterial, upkeepCost);
     }
-
+    
+    //Sign commands
     public void setSign(Block sign) {
-        this.sign = sign;
+        this.sign = (Sign) sign;
     }
     
+    public boolean setSignToOP(){
+        sign.setLine(3, "<ADMIN>");
+        return sign.update();
+    }
+    
+    public boolean setSignToOff(){
+        sign.setLine(3, "<DISABLED>");
+        return sign.update();
+    }
+    
+    public boolean setSignToOn(){
+        sign.setLine(3, "<ENABLED>");
+        return sign.update();
+    }
+    
+    public boolean setSignToDepleted(){
+        sign.setLine(3, "<DEPLETED>");
+        return sign.update();
+    }
+    
+    public boolean setError(){
+        sign.setLine(3, "<ERROR>");
+        return sign.update();
+    }
+    
+    //Chest commands
+    public boolean doUpkeeping(){
+        chest.getInventory().remove(this.getUpkeepStack());
+        return chest.update();
+    }
+    
+    public boolean chestHasReqContent(){
+        return chest.getInventory().contains(upkeepMaterial);
+    }
+    
+    //Pirvates
     private boolean isCorrectValues(Block sign, Block chest) throws UnknownTypeException{
         if(BlockUtil.isSign(sign)){
             if(BlockUtil.isChest(chest))

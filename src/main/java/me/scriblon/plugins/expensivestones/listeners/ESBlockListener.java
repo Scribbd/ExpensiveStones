@@ -15,10 +15,20 @@
  */
 package me.scriblon.plugins.expensivestones.listeners;
 
+import me.scriblon.plugins.expensivestones.ExpensiveField;
+import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
+import me.scriblon.plugins.expensivestones.utils.BlockUtil;
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
+import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.plugin.Plugin;
 
 /**
  * ExpensiveStones Listener for sign place event and the placing of FieldBlocks
@@ -26,13 +36,47 @@ import org.bukkit.event.block.SignChangeEvent;
  */
 public class ESBlockListener extends BlockListener{
     
-
+    private PreciousStones stones;
+    private Plugin plugin;
+    
+    public ESBlockListener(){
+        stones = PreciousStones.getInstance();
+        plugin = ExpensiveStones.getInstance();
+    }
     
     
     @Override
     public void onSignChange(SignChangeEvent event) {
         if(event.isCancelled())
             return;
+        
+        if(!event.getLine(0).equalsIgnoreCase("[ExpField]"))
+            return;
+        
+        Player player = event.getPlayer();
+        
+        if(!event.getLine(1).equalsIgnoreCase("admin")){
+            if(!player.hasPermission("ExpensiveStones.admin")){
+                //TODO register field in normal plugin.
+            }else{
+                player.sendMessage(ChatColor.YELLOW + "You don't have permission to create an admin-field");
+                event.setCancelled(true);
+                return;
+            }
+        }else{
+            //TODO register as ExpensiveField
+        }
+        
+        Block sign = event.getBlock();
+        
+        
+        Block chest = BlockUtil.getChest(sign);
+        Field field = stones.getForceFieldManager().getField(BlockUtil.getFieldStone(sign));
+                
+        ExpensiveField expField = new ExpensiveField(sign, chest, field);
+        
+        //If everything succeeds\
+        UpKeeper keeper;
         
     }
 

@@ -17,6 +17,7 @@ package me.scriblon.plugins.expensivestones.tasks;
 
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import org.bukkit.block.Chest;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -29,23 +30,36 @@ public class UpKeeper implements Runnable{
     private JavaPlugin plugin;
     private ExpensiveField field;
     private BukkitScheduler scheduler;
+    private int iD = -1;
     
-    public UpKeeper(JavaPlugin plugin, ExpensiveField field, BukkitScheduler scheduler){
+    public UpKeeper(ExpensiveField field){
+        super();
         this.field = field;
-        this.scheduler = scheduler;
-        this.plugin = plugin;
+        plugin = ExpensiveStones.getInstance();
+        scheduler = plugin.getServer().getScheduler();
     }
     
     public void run() {
         // Check chest for required content
         if(field.chestHasReqContent()){
-            //Substract if available
-            field.getChest().getInventory().remove(field.getUpkeepStack());
-            //scheduler.scheduleSyncDelayedTask(ExpensiveStones.getInstance(), new UpKeeper(field, scheduler), field.getUpkeepPeriod());
+            field.doUpkeeping();
         }else{
-            
+            //Change sign
+            field.setSignToDepleted();
+            //Cancel task
+            if(iD != -1)
+                this.stopThis();
+            else
+                field.setError();
         }
         
     }
     
+    public void scheduleThis(){
+        iD = this.scheduler.scheduleSyncRepeatingTask(plugin, this, 0, field.getUpkeepPeriod());
+    }
+    
+    public void stopThis(){
+        this.scheduler.cancelTask(iD);
+    }
 }

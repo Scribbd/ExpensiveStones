@@ -62,7 +62,7 @@ public class BlockUtil {
      * @param sign
      * @return gets block
      */
-    public static Block hasFieldStone(Block sign){
+    public static Block getFieldStone(Block sign){
         Block block;
         for(int x = -1; x<2; x++){
             for(int y = -1; y<2; y++){
