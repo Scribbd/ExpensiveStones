@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 import me.scriblon.plugins.expensivestones.managers.Configurator;
 import me.scriblon.plugins.expensivestones.listeners.ESBlockListener;
 import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
+import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
@@ -30,11 +32,14 @@ import org.bukkit.scheduler.BukkitScheduler;
 public class ExpensiveStones extends JavaPlugin {
     private final String prefix =  "[" + getDescription().getFullName() + "] ";
     private static final Logger log = Logger.getLogger("Minecraft");
-    
+    // Mine
     private static ExpensiveStones expStones;
-    
+    // Executor and Commanders
     private ESBlockListener esBlockListener;
     private ESCommandExecutor esCommandEx;
+    // Managers
+    private ESFieldManager eSFieldManager;
+    private ESStorageManager eSStorageManager;
     
     public void onDisable() {
         infoLog("is now disabled!");

@@ -16,9 +16,9 @@
 package me.scriblon.plugins.expensivestones;
 
 import javax.lang.model.type.UnknownTypeException;
-import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -34,25 +34,32 @@ public class ExpensiveField {
     private Sign sign;
     private Chest chest;
     private Field field;
-    // extended
-    private int upkeepCost;
-    private long upkeepPeriod;
-    private Material upkeepMaterial;
-    private ESFieldManager esFieldManager;
+    private Location chestLocation;
+    private Location signLocations;
+    // extended (not yet implemented in db)
+    private ESFieldSettings settings;
     
-    public ExpensiveField(Block sign, Block chest, Field field) throws UnknownTypeException{
+    /**
+     * Contructor gets UpkeepMaterial, amount and cost from 
+     * @param sign
+     * @param signLocation
+     * @param chest
+     * @param chestLocation
+     * @param field
+     * @throws UnknownTypeException 
+     */
+    public ExpensiveField(Block sign, Location signLocation, 
+            Block chest, Location chestLocation, Field field, ESFieldSettings settings) throws UnknownTypeException{
         if(isCorrectValues(sign, chest)){
             this.sign = (Sign) sign;
+            this.chestLocation = chestLocation;
             this.chest = (Chest) chest;
+            this.signLocations = signLocation;
             this.field = field;
-            //TODO figure efficient way to get upkeepMaterial, amount and cost
+            this.settings = settings;
         }
     }
     
-    public long getUpkeepPeriod(){
-        return upkeepPeriod;
-    }
-
     public Chest getChest() {
         return chest;
     }
@@ -64,13 +71,9 @@ public class ExpensiveField {
     public Sign getSign() {
         return sign;
     }
-
-    public Material getUpkeepMaterial() {
-        return upkeepMaterial;
-    }
-
-    public ItemStack getUpkeepStack(){
-        return new ItemStack(upkeepMaterial, upkeepCost);
+    
+    public ESFieldSettings getSettings(){
+        return settings;
     }
     
     //Sign commands
@@ -105,12 +108,12 @@ public class ExpensiveField {
     
     //Chest commands
     public boolean doUpkeeping(){
-        chest.getInventory().remove(this.getUpkeepStack());
+        chest.getInventory().remove(settings.getUpkeepStack());
         return chest.update();
     }
     
     public boolean chestHasReqContent(){
-        return chest.getInventory().contains(upkeepMaterial);
+        return chest.getInventory().contains(settings.getMaterial());
     }
     
     //Pirvates
