@@ -33,7 +33,6 @@ public class UpKeeper implements Runnable{
     private int iD = -1;
     
     public UpKeeper(ExpensiveField field){
-        super();
         this.field = field;
         plugin = ExpensiveStones.getInstance();
         scheduler = plugin.getServer().getScheduler();
@@ -56,7 +55,7 @@ public class UpKeeper implements Runnable{
     }
     
     public void scheduleThis(){
-        iD = this.scheduler.scheduleSyncRepeatingTask(plugin, this, 0, field.getUpkeepPeriod());
+        iD = this.scheduler.scheduleSyncRepeatingTask(plugin, this, 0, field.getSettings().getUpkeepPeriod());
     }
     
     public void stopThis(){

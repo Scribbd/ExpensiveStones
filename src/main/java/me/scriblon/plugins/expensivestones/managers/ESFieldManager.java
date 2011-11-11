@@ -18,25 +18,26 @@ package me.scriblon.plugins.expensivestones.managers;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 
 /**
- *
+ * For adding, deletion and modification off fields.
  * @author 5894913
  */
 public class ESFieldManager {
     
     private PreciousStones stones;
     
-    private Map<Integer, Long> upkeepIntervals = Collections.synchronizedMap(new LinkedHashMap<Integer, Long>());
+    private Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
     
     public ESFieldManager(){
         stones = PreciousStones.getInstance();
     }
     
-    public long getUpkeepInterval(int blockId){
-        if(upkeepIntervals.containsKey(blockId))
-            return upkeepIntervals.get(blockId);
-        return 600L;
+    public ESFieldSettings getESFieldSetting(int iD){
+        if(settings.containsKey(iD))
+            return settings.get(iD);
+        return null;
     }
 }

@@ -48,6 +48,9 @@ public class ExpensiveStones extends JavaPlugin {
     public void onEnable() {
         infoLog("Starting to load!");
         expStones = this;
+        // initialize Managers
+        eSFieldManager = new ESFieldManager();
+        eSStorageManager = new ESStorageManager();
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
         final BukkitScheduler scheduler = this.getServer().getScheduler();
@@ -82,6 +85,14 @@ public class ExpensiveStones extends JavaPlugin {
     
     private void infoLog(String Message){
         log.log(Level.INFO, new StringBuilder().append(prefix).append(Message).toString());
+    }
+
+    public ESFieldManager getESFieldManager() {
+        return eSFieldManager;
+    }
+
+    public ESStorageManager getESStorageManager() {
+        return eSStorageManager;
     }
     
     public static Logger getLogger(){

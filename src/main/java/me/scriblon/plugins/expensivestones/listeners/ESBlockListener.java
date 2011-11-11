@@ -22,6 +22,7 @@ import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -57,6 +58,7 @@ public class ESBlockListener extends BlockListener{
         
         if(!event.getLine(1).equalsIgnoreCase("admin")){
             if(!player.hasPermission("ExpensiveStones.admin")){
+                //TODO transfer field over to preciousStone DB.
                 //TODO register field in normal plugin.
             }else{
                 player.sendMessage(ChatColor.YELLOW + "You don't have permission to create an admin-field");
@@ -66,16 +68,18 @@ public class ESBlockListener extends BlockListener{
         }else{
             //TODO register as ExpensiveField
         }
-        
+        //Get values needed for 
         Block sign = event.getBlock();
-        
-        
+        Location signLocation = sign.getLocation();
+      
         Block chest = BlockUtil.getChest(sign);
-        Field field = stones.getForceFieldManager().getField(BlockUtil.getFieldStone(sign));
-                
-        ExpensiveField expField = new ExpensiveField(sign, chest, field);
+        Location chestLocation = sign.getLocation();
         
-        //If everything succeeds\
+        Field field = stones.getForceFieldManager().getField(BlockUtil.getFieldStone(sign));
+        //Make expField
+        ExpensiveField expField = new ExpensiveField(sign, signLocation, chest, chestLocation, field);
+        
+        //If everything succeeds
         UpKeeper keeper;
         
     }

@@ -56,7 +56,7 @@ public class ExpensiveField {
             this.chest = (Chest) chest;
             this.signLocations = signLocation;
             this.field = field;
-            this.settings = settings;
+            this.settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
         }
     }
     
