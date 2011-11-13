@@ -42,6 +42,7 @@ public class ExpensiveStones extends JavaPlugin {
     private ESStorageManager eSStorageManager;
     
     public void onDisable() {
+        eSStorageManager.saveAll();
         infoLog("is now disabled!");
     }
 

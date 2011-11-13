@@ -13,24 +13,28 @@
  *You should have received a copy of the GNU General Public License
  *along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.scriblon.plugins.expensivestones.tasks;
+package me.scriblon.plugins.expensivestones;
 
-import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
- * For regular updating from the chace.
+ * PreciousStones requires to have an event
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
-public class UpDater implements Runnable{
-    
-    private final ESStorageManager storage;
-    
-    public UpDater(ESStorageManager storage){
-        this.storage = storage;
+public class DummyPlaceEvent extends BlockPlaceEvent{
+
+    public DummyPlaceEvent(Block placedBlock, BlockState replacedBlockState, Block placedAgainst, ItemStack itemInHand, Player thePlayer, boolean canBuild) {
+        super(placedBlock, replacedBlockState, placedAgainst, itemInHand, thePlayer, canBuild);
     }
-            
-    public void run() {
-            storage.saveAll();
+
+    @Override
+    public void setCancelled(boolean cancel) {
+        //Void up.
     }
+    
     
 }

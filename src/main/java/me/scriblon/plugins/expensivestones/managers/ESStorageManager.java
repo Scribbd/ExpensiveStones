@@ -17,10 +17,13 @@ package me.scriblon.plugins.expensivestones.managers;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.scriblon.plugins.expensivestones.DummyPlaceEvent;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.utils.DBFactory;
@@ -41,14 +44,17 @@ public class ESStorageManager {
     
     private PreciousStones stones;
     private DBCore db;
-    private Logger log;
+    private static final Logger log = ExpensiveStones.getLogger();
     
-    private final List<ExpensiveField> pending = Collections.synchronizedList(new LinkedList());;
+    private final Map<Long, Integer> pendingStatusMutation = Collections.synchronizedMap(new LinkedHashMap<Long, Integer>());
+    private final Set<ExpensiveField> pendingTransfer = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>()); //AKA transfer from PreciousStone to ExpensiveStone
+    private final Set<Long> pendingDeletions = Collections.synchronizedSet(new LinkedHashSet<Long>());
+    
+    private final DummyPlaceEvent dummyEvent = new DummyPlaceEvent(null, null, null, null, null, false);
     
     public ESStorageManager(){
         stones = PreciousStones.getInstance();
         db = DBFactory.produceDB();
-        log = ExpensiveStones.getLogger();
     }
     
         /**
@@ -56,14 +62,14 @@ public class ESStorageManager {
      * Might consider using own config.yml file and configure it there. But what is the fun in that ;)
      * @return 
      */
-    public List<Integer> getConfiguredFields(){
-        List<Integer> configured = new LinkedList<Integer>();
+    public Set<Integer> getConfiguredFields(){
+        Set<Integer> configured = new LinkedHashSet<Integer>();
         SettingsManager psSettings = stones.getSettingsManager();
         //Get settings from PreciousStones
         List<LinkedHashMap<String, Object>> forceFieldStones = psSettings.getForceFieldBlocks();
         for(LinkedHashMap<String, Object> stone : forceFieldStones){
             if(stone.containsKey("block") && stone.containsKey("ExpensiveField")){
-                if(psSettings.isFieldType((Integer) stone.get("block")) &&  Helper.isBoolean(stone.get("ExpensiveField"))){
+                if(psSettings.isFieldType((Integer) stone.get("block")) &&  Helper.convertBoolean(stone.get("ExpensiveField"))){
                     configured.add((Integer) stone.get("block"));
                 }
             }
@@ -153,19 +159,68 @@ public class ESStorageManager {
         }
     }
     
-    public void offerExpensiveField(ExpensiveField expField){
-        pending.add(expField);
+    // Offers
+    public void transferExpensiveField(ExpensiveField expField){
+        pendingTransfer.add(expField);
     }
     
-    public void deleteExpensiveField(ExpensiveField expField){
-        
+    public void offerToggleOn(ExpensiveField expField){
+        pendingStatusMutation.put(expField.getField().getId(), ES_ENABLED);
     }
     
-    public void insertExpensiveField(ExpensiveField expField) {
-        
+    public void offerToggleOff(ExpensiveField expField){
+        pendingStatusMutation.put(expField.getField().getId(), ES_DISABLED);
     }
     
-    public void getExpensiveFields(){
-        
+    public void offerToggleOp(ExpensiveField expField){
+        pendingStatusMutation.put(expField.getField().getId(), ES_ADMIN);
+    }
+    
+    public void offerDeletion(ExpensiveField expField){
+        synchronized (this){
+            Long id = expField.getField().getId();
+            if(pendingTransfer.contains(expField))
+                pendingTransfer.remove(expField);
+            else
+                pendingDeletions.add(id);
+        }
+    }
+    
+    // Executors
+    public List<ExpensiveField> getExpensiveFields(String world){
+        if(db.checkConnection()){
+            //Taken from preciousStones, altered querry to match
+        }else{
+            return null;
+        }
+        return null;
+    }
+    
+    public void deleteExpensiveField(){
+        if(pendingDeletions.isEmpty())
+            return;
+        for(Long single: pendingDeletions){
+            
+        }
+    }
+    
+    public void insertExpensiveField() {
+
+    }
+    
+    public void transferFieldBack(){
+
+    }
+    
+    public void transferField(){
+
+    }
+    
+    public void saveAll(){
+        synchronized(this){
+            this.deleteExpensiveField();
+            this.insertExpensiveField();
+            this.transferFieldBack();
+        }
     }
 }

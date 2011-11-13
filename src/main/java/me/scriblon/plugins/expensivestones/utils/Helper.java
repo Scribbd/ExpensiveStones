@@ -21,7 +21,7 @@ package me.scriblon.plugins.expensivestones.utils;
  */
 public class Helper {
     
-    public static boolean isBoolean(Object o){
+    public static boolean convertBoolean(Object o){
         if(o instanceof Boolean)
             return (Boolean) o;
         return false;

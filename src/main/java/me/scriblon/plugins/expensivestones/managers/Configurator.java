@@ -16,8 +16,8 @@
 package me.scriblon.plugins.expensivestones.managers;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
@@ -71,7 +71,7 @@ public class Configurator {
             logInfo("Disable-table pressent");
         }
         //Get data from disabled-field to match other tables
-        List<ExpensiveField> fields = Collections.synchronizedList(new LinkedList<ExpensiveField>());
+        Set<ExpensiveField> fields = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>());
         
         //Get data from backup-field for immediate processing
         
