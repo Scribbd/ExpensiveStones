@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import me.scriblon.plugins.expensivestones.DummyPlaceEvent;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.utils.DBFactory;
@@ -47,10 +46,8 @@ public class ESStorageManager {
     private static final Logger log = ExpensiveStones.getLogger();
     
     private final Map<Long, Integer> pendingStatusMutation = Collections.synchronizedMap(new LinkedHashMap<Long, Integer>());
-    private final Set<ExpensiveField> pendingTransfer = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>()); //AKA transfer from PreciousStone to ExpensiveStone
     private final Set<Long> pendingDeletions = Collections.synchronizedSet(new LinkedHashSet<Long>());
-    
-    private final DummyPlaceEvent dummyEvent = new DummyPlaceEvent(null, null, null, null, null, false);
+    private final Set<ExpensiveField> pendingAdditions = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>());
     
     public ESStorageManager(){
         stones = PreciousStones.getInstance();
@@ -113,57 +110,7 @@ public class ESStorageManager {
         }
     }
     
-    /**
-     * SQL queries taken from PreciousStones to match fields.
-     * Table will function as backup of the normal fields as there is no disable tag available in preciousStones
-     */
-    public void addBackupToDatabase(){
-        if(stones.getSettingsManager().isUseMysql()){
-            if(db.checkConnection()){
-                db.execute("CREATE TABLE IF NOT EXISTS 'exstone_backup' (  "
-                        + "'id' bigint(20) NOT NULL auto_increment,  "
-                        + "'x' int(11) default NULL,  'y' int(11) default NULL, 'z' int(11) default NULL,  "
-                        + "'world' varchar(25) default NULL,  "
-                        + "'radius' int(11) default NULL,  "
-                        + "'height' int(11) default NULL,  "
-                        + "'velocity' float default NULL,  "
-                        + "'type_id' int(11) default NULL,  "
-                        + "'owner' varchar(16) NOT NULL,  "
-                        + "'name' varchar(50) NOT NULL,  "
-                        + "'packed_allowed' text NOT NULL, "
-                        + "'last_used' bigint(20) Default NULL, "
-                        + "'flags' TEXT NOT NULL, "
-                        + "PRIMARY KEY  ('id'),  "
-                        + "UNIQUE KEY 'uq_pstone_fields_1' ('x','y','z','world')");
-                log.log(Level.INFO, "[ExpensiveStones] MySQL Connection Failed");
-            }
-        }else{
-            if(db.checkConnection()){
-                db.execute("CREATE TABLE IF NOT EXISTS 'pstone_fields' (  "
-                        + "'id' INTEGER PRIMARY KEY, "
-                        + "'x' int(11) default NULL,  'y' int(11) default NULL, 'z' int(11) default NULL,  "
-                        + "'world' varchar(25) default NULL,  "
-                        + "'radius' int(11) default NULL,  "
-                        + "'height' int(11) default NULL,  "
-                        + "'velocity' float default NULL,  "
-                        + "'type_id' int(11) default NULL,  "
-                        + "'owner' varchar(16) NOT NULL,  "
-                        + "'name' varchar(50) NOT NULL,  "
-                        + "'packed_allowed' text NOT NULL, "
-                        + "'last_used' bigint(20) Default NULL, "
-                        + "'flags' TEXT NOT NULL, "
-                        + "UNIQUE ('x','y','z','world')");
-            }else{
-                log.log(Level.INFO, "[ExpensiveStones] SQLite Connection Failed");
-            }
-        }
-    }
-    
-    // Offers
-    public void transferExpensiveField(ExpensiveField expField){
-        pendingTransfer.add(expField);
-    }
-    
+    // Offers    
     public void offerToggleOn(ExpensiveField expField){
         pendingStatusMutation.put(expField.getField().getId(), ES_ENABLED);
     }
@@ -176,21 +123,20 @@ public class ESStorageManager {
         pendingStatusMutation.put(expField.getField().getId(), ES_ADMIN);
     }
     
+    /**
+     * 
+     * @param expField 
+     */
     public void offerDeletion(ExpensiveField expField){
-        synchronized (this){
-            Long id = expField.getField().getId();
-            if(pendingTransfer.contains(expField))
-                pendingTransfer.remove(expField);
-            else
-                pendingDeletions.add(id);
-        }
+        pendingDeletions.add(expField.getField().getId());
     }
     
     // Executors
     public List<ExpensiveField> getExpensiveFields(String world){
         if(db.checkConnection()){
-            //Taken from preciousStones, altered querry to match
+            
         }else{
+            ExpensiveStones.infoLog("Database Error, can't connect! (selection)");
             return null;
         }
         return null;
@@ -199,28 +145,32 @@ public class ESStorageManager {
     public void deleteExpensiveField(){
         if(pendingDeletions.isEmpty())
             return;
-        for(Long single: pendingDeletions){
-            
+        if(db.checkConnection()){
+            for(Long single: pendingDeletions){
+
+            }
+        }else{
+            ExpensiveStones.infoLog("Database Error, can't connect! (deletion)");
         }
     }
     
     public void insertExpensiveField() {
-
-    }
-    
-    public void transferFieldBack(){
-
-    }
-    
-    public void transferField(){
-
+        if(pendingAdditions.isEmpty())
+            return;
+        if(db.checkConnection()){
+            for(ExpensiveField single: pendingAdditions){
+            
+            
+            }
+        }else{
+            ExpensiveStones.infoLog("Database Error, can't connect! (addition)");
+        }
     }
     
     public void saveAll(){
         synchronized(this){
             this.deleteExpensiveField();
             this.insertExpensiveField();
-            this.transferFieldBack();
         }
     }
 }

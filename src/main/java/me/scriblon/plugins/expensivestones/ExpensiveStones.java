@@ -30,7 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public class ExpensiveStones extends JavaPlugin {
-    private final String prefix =  "[" + getDescription().getFullName() + "] ";
+    private static final String prefix =  "[ExpensiveStones] ";
     private static final Logger log = Logger.getLogger("Minecraft");
     // Mine
     private static ExpensiveStones expStones;
@@ -84,7 +84,7 @@ public class ExpensiveStones extends JavaPlugin {
         this.getCommand("es").setExecutor(esCommandEx);
     }
     
-    private void infoLog(String Message){
+    public static void infoLog(String Message){
         log.log(Level.INFO, new StringBuilder().append(prefix).append(Message).toString());
     }
 

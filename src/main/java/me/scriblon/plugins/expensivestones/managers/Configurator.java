@@ -58,17 +58,11 @@ public class Configurator {
      */
     public void configureStones(){
         //Check and add if tables are present
-        if(!storageManager.dbHasBackup()){
-            logInfo("Adding Backup-table");
-            storageManager.addBackupToDatabase();
-        }else{
-            logInfo("Backup-table pressent");
-        }
         if(!storageManager.dbHasDisabled()){
-            logInfo("Adding Disabled Table");
+            logInfo("Adding ExpenisveStone Table");
             storageManager.addDisabledToDatabase();
         }else{
-            logInfo("Disable-table pressent");
+            logInfo("ExpensiveStone Table pressent");
         }
         //Get data from disabled-field to match other tables
         Set<ExpensiveField> fields = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>());

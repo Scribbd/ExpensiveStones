@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
+import me.scriblon.plugins.expensivestones.ExpensiveField;
+import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 
 /**
@@ -28,16 +30,40 @@ import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 public class ESFieldManager {
     
     private PreciousStones stones;
+    private ESStorageManager storage;
     
     private Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
     
     public ESFieldManager(){
         stones = PreciousStones.getInstance();
+        storage = ExpensiveStones.getInstance().getESStorageManager();
     }
     
     public ESFieldSettings getESFieldSetting(int iD){
         if(settings.containsKey(iD))
             return settings.get(iD);
         return null;
+    }
+    
+    //Adders
+    public void addESField(ExpensiveField field){
+        
+    }
+    //Deleters
+    public void removeESField(ExpensiveField field){
+        
+    }
+    
+    //Togglers
+    public void disableESField(ExpensiveField field){
+        
+    }
+    
+    public void enableESField(ExpensiveField field){
+        
+    }
+    
+    public void adminESField(ExpensiveField field){
+        
     }
 }
