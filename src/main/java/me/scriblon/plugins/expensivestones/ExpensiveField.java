@@ -34,8 +34,6 @@ public class ExpensiveField {
     private Sign sign;
     private Chest chest;
     private Field field;
-    private Location chestLocation;
-    private Location signLocations;
     // extended (not yet implemented in db)
     private ESFieldSettings settings;
     
@@ -48,13 +46,10 @@ public class ExpensiveField {
      * @param field
      * @throws UnknownTypeException 
      */
-    public ExpensiveField(Block sign, Location signLocation, 
-            Block chest, Location chestLocation, Field field, ESFieldSettings settings) throws UnknownTypeException{
+    public ExpensiveField(Block sign, Block chest, Field field) throws UnknownTypeException{
         if(isCorrectValues(sign, chest)){
             this.sign = (Sign) sign;
-            this.chestLocation = chestLocation;
             this.chest = (Chest) chest;
-            this.signLocations = signLocation;
             this.field = field;
             this.settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
         }

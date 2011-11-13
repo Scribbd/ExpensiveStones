@@ -70,14 +70,12 @@ public class ESBlockListener extends BlockListener{
         }
         //Get values needed for 
         Block sign = event.getBlock();
-        Location signLocation = sign.getLocation();
-      
+        
         Block chest = BlockUtil.getChest(sign);
-        Location chestLocation = sign.getLocation();
         
         Field field = stones.getForceFieldManager().getField(BlockUtil.getFieldStone(sign));
         //Make expField
-        ExpensiveField expField = new ExpensiveField(sign, signLocation, chest, chestLocation, field);
+        ExpensiveField expField = new ExpensiveField(sign, chest, field);
         
         //If everything succeeds
         UpKeeper keeper;
@@ -94,6 +92,7 @@ public class ESBlockListener extends BlockListener{
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.isCancelled())
             return;
+        
     }
     
     
