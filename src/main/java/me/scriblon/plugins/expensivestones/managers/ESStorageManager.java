@@ -81,7 +81,7 @@ public class ESStorageManager {
         return configured;
     }
     
-    public boolean dbHasDisabled(){
+    public boolean dbHasExpensive(){
         return db.existsTable("exstones_disabled");
     }
     

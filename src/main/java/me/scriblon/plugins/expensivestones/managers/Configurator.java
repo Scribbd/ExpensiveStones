@@ -16,10 +16,11 @@
 package me.scriblon.plugins.expensivestones.managers;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
@@ -58,15 +59,16 @@ public class Configurator {
      */
     public void configureStones(){
         //Check and add if tables are present
-        if(!storageManager.dbHasDisabled()){
+        if(!storageManager.dbHasExpensive()){
             logInfo("Adding ExpenisveStone Table");
             storageManager.addExpensiveTableToDatabase();
         }else{
             logInfo("ExpensiveStone Table pressent");
         }
-        //Get data from ExpensiveStones-field to match other tables
-        Set<ExpensiveField> fields = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>());
-        
+        //Get data from ExpensiveStones-table to match other tables
+        Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
+        settings.putAll(settings);
+        //
         
         //Schedule Tasks
         for(ExpensiveField field : fields){

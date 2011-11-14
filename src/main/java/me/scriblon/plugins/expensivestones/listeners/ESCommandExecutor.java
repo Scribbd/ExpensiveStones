@@ -15,10 +15,13 @@
  */
 package me.scriblon.plugins.expensivestones.listeners;
 
+import java.util.Map;
+import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 /**
@@ -43,6 +46,10 @@ public class ESCommandExecutor implements CommandExecutor{
         
         
         return false;
+    }
+    
+    public Map<Integer, ESFieldSettings> getConfiguration(){
+        FileConfiguration config = stones.getConfig();
     }
     
 }
