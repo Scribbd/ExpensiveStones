@@ -99,6 +99,14 @@ public class ExpensiveField {
         return status;
     }
     
+    public boolean setStatus(int status) {
+        if(status == ESStorageManager.ES_ENABLED || status == ESStorageManager.ES_ADMIN || status == ESStorageManager.ES_DISABLED){
+            this.status = status;
+            return true;
+        }
+        return false;
+    }
+    
     public ESFieldSettings getSettings(){
         return settings;
     }

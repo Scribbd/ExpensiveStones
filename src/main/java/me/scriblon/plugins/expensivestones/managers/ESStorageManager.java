@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,10 +85,6 @@ public class ESStorageManager {
         return db.existsTable("exstones_disabled");
     }
     
-    public boolean dbHasBackup(){
-        return db.existsTable("exstones_backup");
-    }
-    
     public void addExpensiveTableToDatabase(){
         if(stones.getSettingsManager().isUseMysql()){
             if(db.checkConnection()){
@@ -118,17 +115,33 @@ public class ESStorageManager {
         }
     }
     
-    // Offers    
+    // Offers
+    public void offerAddition(ExpensiveField expField){
+        pendingAdditions.add(expField);
+    }
+    
     public void offerToggleOn(ExpensiveField expField){
-        pendingStatusMutations.put(expField.getField().getId(), ES_ENABLED);
+        long id = expField.getField().getId();
+        if(!pendingUpdates.containsKey(id))
+            pendingStatusMutations.put(expField.getField().getId(), ES_ENABLED);
+        else
+            expField.setStatus(ES_ENABLED);
     }
     
     public void offerToggleOff(ExpensiveField expField){
-        pendingStatusMutations.put(expField.getField().getId(), ES_DISABLED);
+        long id = expField.getField().getId();
+        if(!pendingUpdates.containsKey(id))
+            pendingStatusMutations.put(expField.getField().getId(), ES_DISABLED);
+        else
+            expField.setStatus(ES_DISABLED);
     }
     
     public void offerToggleOp(ExpensiveField expField){
-        pendingStatusMutations.put(expField.getField().getId(), ES_ADMIN);
+        long id = expField.getField().getId();
+        if(!pendingUpdates.containsKey(id))
+            pendingStatusMutations.put(expField.getField().getId(), ES_ADMIN);
+        else
+            expField.setStatus(ES_ADMIN);
     }
     
     public boolean setToggle(ExpensiveField expField, int status){
@@ -137,6 +150,19 @@ public class ESStorageManager {
             return true;
         }
         return false;
+    }
+    
+    public void offerUpdatedField(ExpensiveField expField){
+        Long id = expField.getField().getId();
+        if(pendingStatusMutations.containsKey(id)){
+            expField.setStatus(pendingStatusMutations.get(id));
+            pendingStatusMutations.remove(id);
+        }
+        pendingUpdates.put(id, expField);
+    }
+    
+    private boolean checkWholeField(ExpensiveField expField){
+        return pendingUpdates.containsKey(expField.getField().getId());
     }
     
     /**
@@ -187,11 +213,12 @@ public class ESStorageManager {
                             Location field = new Location(thisWorld, x, y, z);
                             
                             fields.add(new ExpensiveField(status, sign, chest, field));
-                            
+                         
                         }catch(Exception ex){
                             ExpensiveStones.infoLog(ex.getMessage()); 
-                        }
-                    }           
+                        }                        
+                    }   
+                    res.close();
                 }catch(SQLException ex){
                     Logger.getLogger(ESStorageManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -219,9 +246,10 @@ public class ESStorageManager {
                         + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ",'"
                         + Helper.escapeQuotes(single.getField().getWorld()) + "');");
             }
+            pendingAdditions.clear();
         }else{
             ExpensiveStones.infoLog("Database Error, can't connect! (addition)");
-        }
+        }     
     }
     
     public void deleteExpensiveField(){
@@ -232,6 +260,7 @@ public class ESStorageManager {
                 db.delete("DELETE FROM 'exstone_fields' "
                         + "WHERE id = " + single);
             }
+            pendingDeletions.clear();
         }else{
             ExpensiveStones.infoLog("Database Error, can't connect! (deletion)");
         }
@@ -241,7 +270,12 @@ public class ESStorageManager {
         if(pendingStatusMutations.isEmpty())
             return;
         if(db.checkConnection()){
-            //
+            for(Entry single : pendingStatusMutations.entrySet()){
+                db.update("UPDATE 'exstone_fields' "
+                        + "SET 'status' = " + single.getValue()
+                        + "WHERE 'id' = " + single.getKey());
+            }
+            pendingStatusMutations.clear();
         }else{
             ExpensiveStones.infoLog("Database Error, can't connect! (deletion)");
         }
@@ -251,7 +285,22 @@ public class ESStorageManager {
         if(pendingUpdates.isEmpty())
             return;
         if(db.checkConnection()){
-            //
+            for(Entry single : pendingUpdates.entrySet()){
+                ExpensiveField field = (ExpensiveField) single.getValue();
+                Location chest = field.getChestLocation();
+                Location sign = field.getSignLocation();
+                db.update("UPDATE 'exstone_fields' "
+                        + "SET 'status' = " + field.getStatus() + ","
+                        + "'chestx' = " + chest.getBlockX() + ","
+                        + "'chesty' = " + chest.getBlockY() + ","
+                        + "'chestz' = " + chest.getBlockZ() + ","
+                        + "'signx' = " + sign.getBlockX() + ","
+                        + "'signy' = " + sign.getBlockY() + ","
+                        + "'signz' = " + sign.getBlockZ() + ","
+                        + "'world' = '" + field.getField().getLocation().getWorld() + "' "
+                        + "WHERE 'id' = " + single.getKey() + ";");
+            }
+            pendingUpdates.clear();
         }else{
             ExpensiveStones.infoLog("Database Error, can't connect! (deletion)");
         }
@@ -259,8 +308,10 @@ public class ESStorageManager {
     
     public void saveAll(){
         synchronized(this){
-            this.deleteExpensiveField();
             this.insertExpensiveField();
+            this.deleteExpensiveField();
+            this.updateStatus();
+            this.updateField();
         }
     }
 }

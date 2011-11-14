@@ -48,24 +48,58 @@ public class ESFieldManager {
     }
     
     //Adders
-    public void addESField(ExpensiveField field){
-        
+    public void addField(ExpensiveField field){
+        if(field.getStatus()== ESStorageManager.ES_DISABLED)
+            disabledFields.put(field.getField().getId(), field);
+        else
+            activeFields.put(field.getField().getId(), field);
+        storage.offerAddition(field);
     }
     //Deleters
-    public void removeESField(ExpensiveField field){
-        
+    public void removeField(ExpensiveField field){
+        synchronized(this){
+            Long id = field.getField().getId();
+            if(activeFields.containsKey(id))
+                activeFields.remove(id);
+            if(disabledFields.containsKey(id))
+                disabledFields.remove(id);
+            storage.offerDeletion(field);
+        }
     }
     
     //Togglers
-    public void disableESField(ExpensiveField field){
-        
+    public void disableField(ExpensiveField field){
+        synchronized(this){
+            Long id = field.getField().getId();
+            if(activeFields.containsKey(id) && field.getStatus() != ESStorageManager.ES_ADMIN){
+                activeFields.remove(id);
+                disabledFields.put(id, field);
+                field.setStatus(ESStorageManager.ES_DISABLED);
+            }
+        }       
     }
     
-    public void enableESField(ExpensiveField field){
-        
+    public void enableField(ExpensiveField field){
+        synchronized(this){
+            Long id = field.getField().getId();
+            if(disabledFields.containsKey(id)){
+                disabledFields.remove(id);
+                activeFields.put(id, field);
+                field.setStatus(ESStorageManager.ES_ENABLED);
+            }
+        } 
     }
     
     public void adminESField(ExpensiveField field){
-        
+        synchronized(this){
+            Long id = field.getField().getId();
+            if(disabledFields.containsKey(id)){
+                disabledFields.remove(id);
+            }
+            if(!activeFields.containsKey(id)){
+                activeFields.put(id, field);
+            }
+            field.setStatus(ESStorageManager.ES_ADMIN);
+        }
     }
 }

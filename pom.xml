@@ -32,9 +32,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>PreciousStones</groupId>
+            <groupId>org.PreciousStones</groupId>
             <artifactId>org.PreciousStones</artifactId>
-            <version>7.0.4</version>
+            <version>7.0.5</version>
         </dependency>
     </dependencies>
 </project>
