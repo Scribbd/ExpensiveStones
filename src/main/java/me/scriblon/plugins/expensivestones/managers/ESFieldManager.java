@@ -33,6 +33,8 @@ public class ESFieldManager {
     private ESStorageManager storage;
     
     private Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
+    private Map<Long, ExpensiveField> activeFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
+    private Map<Long, ExpensiveField> disabledFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
     
     public ESFieldManager(){
         stones = PreciousStones.getInstance();

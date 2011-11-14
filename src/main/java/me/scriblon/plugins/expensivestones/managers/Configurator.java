@@ -60,14 +60,13 @@ public class Configurator {
         //Check and add if tables are present
         if(!storageManager.dbHasDisabled()){
             logInfo("Adding ExpenisveStone Table");
-            storageManager.addDisabledToDatabase();
+            storageManager.addExpensiveTableToDatabase();
         }else{
             logInfo("ExpensiveStone Table pressent");
         }
-        //Get data from disabled-field to match other tables
+        //Get data from ExpensiveStones-field to match other tables
         Set<ExpensiveField> fields = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>());
         
-        //Get data from backup-field for immediate processing
         
         //Schedule Tasks
         for(ExpensiveField field : fields){

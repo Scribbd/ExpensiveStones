@@ -26,4 +26,19 @@ public class Helper {
             return (Boolean) o;
         return false;
     }
+    
+    /**
+     * Escapes single quotes
+     * 1 on 1 copy of ExpensiveStones. Credits to their team.
+     * @param str
+     * @return
+     */
+    public static String escapeQuotes(String str)
+    {
+        if (str == null)
+        {
+            return "";
+        }
+        return str.replace("'", "''");
+    }
 }

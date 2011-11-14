@@ -16,25 +16,29 @@
 package me.scriblon.plugins.expensivestones;
 
 import javax.lang.model.type.UnknownTypeException;
+import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * A class deciated to the ExpensiveField combo. Which is a fieldblock, a chest and a sign.
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class ExpensiveField {
+    //Essentials
+    private int status;
     // basics
     private Sign sign;
+    private Location signLocation;
     private Chest chest;
+    private Location chestLocation;
     private Field field;
-    // extended (not yet implemented in db)
+    // extended
     private ESFieldSettings settings;
     
     /**
@@ -48,11 +52,27 @@ public class ExpensiveField {
      */
     public ExpensiveField(Block sign, Block chest, Field field) throws UnknownTypeException{
         if(isCorrectValues(sign, chest)){
+            this.status = ESStorageManager.ES_ENABLED;
+            
             this.sign = (Sign) sign;
+            this.signLocation = sign.getLocation();
             this.chest = (Chest) chest;
+            this.chestLocation = chest.getLocation();
             this.field = field;
             this.settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
         }
+    }
+    
+    public ExpensiveField(int status, Location signLocation, Location chestLocation, Location fieldLocation){
+        this.status = status;
+        this.signLocation = signLocation;
+        this.chestLocation = chestLocation;
+        
+        this.sign = (Sign) signLocation.getBlock();
+        this.chest = (Chest) chestLocation.getBlock();
+        
+        this.field = PreciousStones.getInstance().getForceFieldManager().getField(fieldLocation.getBlock());
+        this.settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
     }
     
     public Chest getChest() {
@@ -65,6 +85,18 @@ public class ExpensiveField {
 
     public Sign getSign() {
         return sign;
+    }
+
+    public Location getChestLocation() {
+        return chestLocation;
+    }
+
+    public Location getSignLocation() {
+        return signLocation;
+    }
+
+    public int getStatus() {
+        return status;
     }
     
     public ESFieldSettings getSettings(){
