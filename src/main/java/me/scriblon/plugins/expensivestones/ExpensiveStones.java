@@ -21,21 +21,22 @@ import java.util.logging.Logger;
 import me.scriblon.plugins.expensivestones.managers.Configurator;
 import me.scriblon.plugins.expensivestones.listeners.ESBlockListener;
 import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
+import me.scriblon.plugins.expensivestones.listeners.ESPlayerListener;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 public class ExpensiveStones extends JavaPlugin {
     private static final String prefix =  "[ExpensiveStones] ";
     private static final Logger log = Logger.getLogger("Minecraft");
     // Mine
     private static ExpensiveStones expStones;
-    // Executor and Commanders
+    // Listeners and Commanders
     private ESBlockListener esBlockListener;
+    private ESPlayerListener esPlayerListener;
     private ESCommandExecutor esCommandEx;
     // Managers
     private ESFieldManager eSFieldManager;
@@ -65,6 +66,7 @@ public class ExpensiveStones extends JavaPlugin {
         config.configureStones();
         // Initialize listeners and executors
         esBlockListener = new ESBlockListener();
+        esPlayerListener = new ESPlayerListener();
         esCommandEx = new ESCommandExecutor();
         //Register
         this.registerEvents(pm);
@@ -77,6 +79,8 @@ public class ExpensiveStones extends JavaPlugin {
         pm.registerEvent(Type.BLOCK_PLACE, esBlockListener, Priority.Highest, this);
         pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Highest, this);
         pm.registerEvent(Type.SIGN_CHANGE, esBlockListener, Priority.Normal, this);
+        pm.registerEvent(Type.REDSTONE_CHANGE, esBlockListener, Priority.Low, this);
+        pm.registerEvent(Type.PLAYER_INTERACT, esPlayerListener, Priority.Normal, this);
     }
     
     private void registerCommands(){

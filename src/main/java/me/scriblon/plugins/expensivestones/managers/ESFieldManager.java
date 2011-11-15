@@ -22,6 +22,7 @@ import java.util.Map;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.Material;
 
@@ -41,6 +42,7 @@ public class ESFieldManager {
     private Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
     private Map<Long, ExpensiveField> activeFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
     private Map<Long, ExpensiveField> disabledFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
+    private Map<Long, Long> taskLink = Collections.synchronizedMap(new LinkedHashMap<Long, Long>());
     
     public ESFieldManager(){
         stones = PreciousStones.getInstance();
@@ -63,10 +65,12 @@ public class ESFieldManager {
     public void addField(ExpensiveField field, boolean newField){
         if(field.getStatus()== ESStorageManager.ES_DISABLED)
             disabledFields.put(field.getField().getId(), field);
-        else
+        else{
             activeFields.put(field.getField().getId(), field);
-        if(newField)
+        }
+        if(newField){
             storage.offerAddition(field);
+        }
     }
     
     public void addFields(List<ExpensiveField> fields, boolean newField){
@@ -138,6 +142,11 @@ public class ESFieldManager {
         }
     }
     
+    public void setupUpKeeper(ExpensiveField field){
+        UpKeeper keeper = new UpKeeper(field);
+        this.setTask(keeper.scheduleMeFreeTick(), field);
+    }
+    
     //Checkers
     public boolean isInDisabled(long id){
         return disabledFields.containsKey(id);
@@ -155,5 +164,31 @@ public class ESFieldManager {
     public Map<Integer, ESFieldSettings> getSettings() {
         return Collections.unmodifiableMap(settings);
     }
+    
+    //!! debug feature Keeping track of all Tasks
+    public Map<Long, Long> getTaskLink() {
+        return Collections.unmodifiableMap(taskLink);
+    }
+    
+    public boolean setTask(long taskID, ExpensiveField field){
+        long fieldID = field.getField().getId();
+        if(!taskLink.containsKey(fieldID)){
+            taskLink.put(fieldID, taskID);
+            return true;
+        }
+        ExpensiveStones.infoLog("(TaskCheck) Field was already running! On ID: " + fieldID);
+        return false;                    
+    }
+    
+    public boolean removeTask(long taskID, ExpensiveField field){
+        long fieldID = field.getField().getId();
+        if(taskLink.containsKey(fieldID)){
+            taskLink.remove(fieldID);
+            return true;
+        }
+        ExpensiveStones.infoLog("(TaskCheck) Field was already removed! On ID: " + fieldID);
+        return false;
+    }
+    
     
 }

@@ -17,17 +17,16 @@ package me.scriblon.plugins.expensivestones.listeners;
 
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
-import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -78,7 +77,6 @@ public class ESBlockListener extends BlockListener{
         ExpensiveField expField = new ExpensiveField(sign, chest, field);
         
         //If everything succeeds
-        UpKeeper keeper;
         
     }
 
@@ -94,7 +92,9 @@ public class ESBlockListener extends BlockListener{
             return;
         
     }
-    
-    
 
+    @Override
+    public void onBlockRedstoneChange(BlockRedstoneEvent event) {
+        //When sign or chest is powered enable field when possible.
+    }
 }

@@ -84,7 +84,9 @@ public class Configurator {
             // Schedule active Field Tasks
         for(Entry field : fieldManager.getActiveFields().entrySet()){
             UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
-            keeper.scheduleThis();
+            long iD = keeper.scheduleMeFreeTick();
+            if(!fieldManager.setTask(keeper.scheduleMeFreeTick(), (ExpensiveField) field.getValue()))
+                keeper.stopMe();
         }
     }
     
