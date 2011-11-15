@@ -1,0 +1,25 @@
+---This plugin requires ExpensiveStones v7.0.5 or higher!---
+
+Welcome to ExpensiveStones Readme, here will you find all info about ExpensiveStones relating to configuration and the workings.
+
+**What is it?**
+ExpensiveStones is a plugin for PreciousStones. PreciousStones is a plugin for bukkit adding a self-protection-service for the players on a server through blocks.
+ExpensiveStones adds upkeepcost to these PreciousStones.
+
+**Why this plugin for a plugin?**
+I adore ExpenisiveStones for its functionality. It allows the player himself to add protections to area's they define their own. But when you play on a all-out-pvp-warfare-server things might go strange when adding a few of these blocks to the mix.
+For example the 'you-shall-not-pass'-block: When set up no one is able to enter the field until it goes down, creating an unfair advatage for the defenders for having a perfect defence.
+What this plugin attempts to do is adding upkeepcost to the use of these stones. Meaning the defenders need to keep their supplies in check or their shield will go down, creating new strategies for the attacker.
+
+**What does it affect on the persistent scale in PreciousStones?**
+This plugin only adds one extra table to the PreciousStones-database. But it won't delete any excisting stones nor will it make excisting stones before install of this plugin turn into ExpensiveStones.
+One command will be implemented to drop the ExpensiveStones-table from the database when this plugin has to be uninstalled.
+
+**How to configure**
+You can define each 'ExpensiveStone' with a custom Material, UpkeepPeriod and the amount of the material required to activate the next cycle.
+Configuring is simply done by adding the next options to the config.yml from PreciousStones:
+  - ExpensiveStone: true/false
+  - ExpensiveMaterial: <itemID> defaults redstone when not present
+  - ExpensivePeriod: <int> [S|T] defaults 15s when not present
+  - ExpensiveCost: <int> defaults 2 when not present
+You can define the Period by either placing 's' or 't', representing 's'econds or 't'icks. Remember that 20t is 1s servertime.
