@@ -92,8 +92,13 @@ public class Configurator {
         for(LinkedHashMap<String, Object> stone : forceFieldStones){
             if(stone.containsKey("block") && stone.containsKey("ExpensiveField")){
                 if(psSettings.isFieldType((Integer) stone.get("block")) &&  Helper.convertBoolean(stone.get("ExpensiveField"))){
+                    int id; 
+                    String name; 
+                    Material material; 
+                    int amount; 
+                    Long upkeepPeriod;
                                         //TODO Finish this
-                    ESFieldSettings fieldSetting = new ESFieldSettings(id, null, Material.AIR, amount, Long.MIN_VALUE);
+                    ESFieldSettings fieldSetting = new ESFieldSettings(id, name, material, amount, upkeepPeriod);
                     settings.put((Integer) stone.get("block"), fieldSetting);
                 }
             }
