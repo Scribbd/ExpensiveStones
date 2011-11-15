@@ -18,6 +18,7 @@ package me.scriblon.plugins.expensivestones.managers;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
@@ -48,13 +49,21 @@ public class ESFieldManager {
     }
     
     //Adders
-    public void addField(ExpensiveField field){
+    public void addField(ExpensiveField field, boolean newField){
         if(field.getStatus()== ESStorageManager.ES_DISABLED)
             disabledFields.put(field.getField().getId(), field);
         else
             activeFields.put(field.getField().getId(), field);
-        storage.offerAddition(field);
+        if(newField)
+            storage.offerAddition(field);
     }
+    
+    public void addFields(Set<ExpensiveField> fields, boolean newField){
+        for(ExpensiveField field : fields){
+            this.addField(field, newField);
+        }
+    }
+    
     //Deleters
     public void removeField(ExpensiveField field){
         synchronized(this){

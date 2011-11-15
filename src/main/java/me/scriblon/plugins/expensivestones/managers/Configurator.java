@@ -17,10 +17,8 @@ package me.scriblon.plugins.expensivestones.managers;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
