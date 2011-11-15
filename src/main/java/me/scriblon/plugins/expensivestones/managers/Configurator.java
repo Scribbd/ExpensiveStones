@@ -17,16 +17,21 @@ package me.scriblon.plugins.expensivestones.managers;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
+import me.scriblon.plugins.expensivestones.utils.Helper;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
+import org.bukkit.Material;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  * Class dedicated to configure PreciousStone on startup.
@@ -35,21 +40,24 @@ import org.bukkit.scheduler.BukkitScheduler;
 public class Configurator {
     
     private PluginManager pm;
-    private BukkitScheduler schedule;
     private PreciousStones stones;
     private ExpensiveStones plugin;
     
     private Logger log;
     private ESStorageManager storageManager;
     private ESFieldManager fieldManager;
+    private SettingsManager psSettings;
     
-    public Configurator(PluginManager pm, BukkitScheduler schedule){
+    public Configurator(PluginManager pm){
         this.pm = pm;
-        this.schedule = schedule;
-        stones = PreciousStones.getInstance();
         log = ExpensiveStones.getLogger();
-        storageManager = new ESStorageManager();
+        // ES Fields
         plugin = ExpensiveStones.getInstance();
+        storageManager = plugin.getESStorageManager();
+        fieldManager = plugin.getESFieldManager();
+        // PS Fields
+        stones = PreciousStones.getInstance();
+        psSettings = stones.getSettingsManager();
     }
     
     /**
@@ -66,9 +74,10 @@ public class Configurator {
             logInfo("ExpensiveStone Table pressent");
         }
         //Get data from ExpensiveStones-table to match other tables
-        Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
-        settings.putAll(settings);
-        //
+        
+        Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(this.getFieldSettings());
+        // Get Fields
+        
         
         //Schedule Tasks
         for(ExpensiveField field : fields){
@@ -77,6 +86,20 @@ public class Configurator {
         }
     }
     
+    public Map<Integer, ESFieldSettings> getFieldSettings(){
+        Map<Integer, ESFieldSettings> settings = new LinkedHashMap<Integer, ESFieldSettings>();
+        List<LinkedHashMap<String, Object>> forceFieldStones = psSettings.getForceFieldBlocks();
+        for(LinkedHashMap<String, Object> stone : forceFieldStones){
+            if(stone.containsKey("block") && stone.containsKey("ExpensiveField")){
+                if(psSettings.isFieldType((Integer) stone.get("block")) &&  Helper.convertBoolean(stone.get("ExpensiveField"))){
+                                        //TODO Finish this
+                    ESFieldSettings fieldSetting = new ESFieldSettings(id, null, Material.AIR, amount, Long.MIN_VALUE);
+                    settings.put((Integer) stone.get("block"), fieldSetting);
+                }
+            }
+        }
+        return settings;
+    }
     
     public boolean isPSAvailable(){
         return pm.getPlugin("PreciousStones") == null;

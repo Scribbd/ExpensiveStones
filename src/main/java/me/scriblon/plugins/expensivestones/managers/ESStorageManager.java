@@ -32,7 +32,6 @@ import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.utils.DBFactory;
 import me.scriblon.plugins.expensivestones.utils.Helper;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
-import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
 import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -59,26 +58,6 @@ public class ESStorageManager {
     public ESStorageManager(){
         stones = PreciousStones.getInstance();
         db = DBFactory.produceDB();
-    }
-    
-        /**
-     * Get List of integers (blockids) which has the expensiveField-tag
-     * Might consider using own config.yml file and configure it there. But what is the fun in that ;)
-     * @return 
-     */
-    public Set<Integer> getConfiguredFields(){
-        Set<Integer> configured = new LinkedHashSet<Integer>();
-        SettingsManager psSettings = stones.getSettingsManager();
-        //Get settings from PreciousStones
-        List<LinkedHashMap<String, Object>> forceFieldStones = psSettings.getForceFieldBlocks();
-        for(LinkedHashMap<String, Object> stone : forceFieldStones){
-            if(stone.containsKey("block") && stone.containsKey("ExpensiveField")){
-                if(psSettings.isFieldType((Integer) stone.get("block")) &&  Helper.convertBoolean(stone.get("ExpensiveField"))){
-                    configured.add((Integer) stone.get("block"));
-                }
-            }
-        }
-        return configured;
     }
     
     public boolean dbHasExpensive(){

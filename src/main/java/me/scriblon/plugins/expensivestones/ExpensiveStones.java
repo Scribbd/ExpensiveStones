@@ -54,9 +54,8 @@ public class ExpensiveStones extends JavaPlugin {
         eSStorageManager = new ESStorageManager();
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
-        final BukkitScheduler scheduler = this.getServer().getScheduler();
         // Control dependencies
-        Configurator config = new Configurator(pm, scheduler);
+        Configurator config = new Configurator(pm);
         if(!config.isPSAvailable()){
             infoLog("PreciousStones not available, disabling plugin!");
             pm.disablePlugin(this);
