@@ -15,20 +15,23 @@
  */
 package me.scriblon.plugins.expensivestones.managers;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map.Entry;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
 import me.scriblon.plugins.expensivestones.utils.Helper;
+import net.sacredlabyrinth.Phaed.PreciousStones.FieldSettings;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.managers.ForceFieldManager;
 import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.plugin.PluginManager;
 
 /**
@@ -41,21 +44,21 @@ public class Configurator {
     private PreciousStones stones;
     private ExpensiveStones plugin;
     
-    private Logger log;
     private ESStorageManager storageManager;
     private ESFieldManager fieldManager;
-    private SettingsManager psSettings;
+    private SettingsManager vanillaSettings;
+    private ForceFieldManager vanillaFieldManager;
     
     public Configurator(PluginManager pm){
         this.pm = pm;
-        log = ExpensiveStones.getLogger();
         // ES Fields
         plugin = ExpensiveStones.getInstance();
         storageManager = plugin.getESStorageManager();
         fieldManager = plugin.getESFieldManager();
         // PS Fields
         stones = PreciousStones.getInstance();
-        psSettings = stones.getSettingsManager();
+        vanillaSettings = stones.getSettingsManager();
+        vanillaFieldManager = stones.getForceFieldManager();
     }
     
     /**
@@ -72,32 +75,36 @@ public class Configurator {
             logInfo("ExpensiveStone Table pressent");
         }
         //Get data from ExpensiveStones-table to match other tables
-        
+            // Get all ESFieldSettings defined in the PreciousStones config.yml
         Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(this.getFieldSettings());
-        // Get Fields
-        
-        
-        //Schedule Tasks
-        for(ExpensiveField field : fields){
-            UpKeeper keeper = new UpKeeper(field);
+        fieldManager.setSettings(settings);
+            // Get known ExpensiveFields
+        List<ExpensiveField> expensiveFields = this.getExpensiveFields();
+        fieldManager.addFields(expensiveFields, false);
+            // Schedule active Field Tasks
+        for(Entry field : fieldManager.getActiveFields().entrySet()){
+            UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
             keeper.scheduleThis();
         }
     }
     
     public Map<Integer, ESFieldSettings> getFieldSettings(){
         Map<Integer, ESFieldSettings> settings = new LinkedHashMap<Integer, ESFieldSettings>();
-        List<LinkedHashMap<String, Object>> forceFieldStones = psSettings.getForceFieldBlocks();
+        List<LinkedHashMap<String, Object>> forceFieldStones = vanillaSettings.getForceFieldBlocks();
         for(LinkedHashMap<String, Object> stone : forceFieldStones){
             if(stone.containsKey("block") && stone.containsKey("ExpensiveField")){
-                if(psSettings.isFieldType((Integer) stone.get("block")) &&  Helper.convertBoolean(stone.get("ExpensiveField"))){
-                    int id; 
-                    String name; 
-                    Material material; 
-                    int amount; 
-                    Long upkeepPeriod;
-                                        //TODO Finish this
-                    ESFieldSettings fieldSetting = new ESFieldSettings(id, name, material, amount, upkeepPeriod);
-                    settings.put((Integer) stone.get("block"), fieldSetting);
+                if(!Helper.isInteger(stone.get("block")))
+                        continue;
+                int type = (Integer) stone.get("block");
+                if(vanillaSettings.isFieldType(type) &&  Helper.convertBoolean(stone.get("ExpensiveField"))){
+                    FieldSettings vanillaFieldSettings = vanillaSettings.getFieldSettings(type);
+                    //Get material
+                    Material material = this.extractMaterial(stone); 
+                    int amount = this.extractCost(stone); 
+                    Long upkeepPeriod = this.extractTime(stone);
+                    ESFieldSettings fieldSetting = new ESFieldSettings(vanillaFieldSettings.getTypeId(), vanillaFieldSettings.getTitle(),
+                            material, amount, upkeepPeriod);
+                    settings.put(vanillaFieldSettings.getTypeId(), fieldSetting);
                 }
             }
         }
@@ -114,6 +121,46 @@ public class Configurator {
     
     private void logInfo(String message){
         message = "[ExpensiveStone] " + message;
-        log.log(Level.INFO, message);
+        ExpensiveStones.infoLog(message);
+    }
+    
+    private Material extractMaterial(LinkedHashMap<String, Object> stone){
+        if (stone.containsKey("ExpensiveMaterial")){
+            if(Helper.isString(stone.get("ExpensiveMaterial")))
+                return (Material) stone.get("ExpensiveMaterial");
+        }
+        return ESFieldManager.STANDARD_MATERIAL;
+    }
+    
+    private Long extractTime(LinkedHashMap<String, Object> stone){
+        if(stone.containsKey("ExpensivePeriod")){
+            if(Helper.isString(stone.get("ExpensivePeriod"))){
+                String period = (String) stone.get("ExpensivePeriod");
+                period = period.replaceAll(" ", "");
+                if(period.endsWith("L") || period.endsWith("l")){
+                    return Long.parseLong(period);
+                } else {
+                    period = period.replaceAll("[a-zA-Z]", period);
+                    return Long.parseLong(period) * 20L;
+                }
+            }
+        }
+        return ESFieldManager.STANDARD_PERIOD;
+    }
+    
+    private int extractCost(LinkedHashMap<String, Object> stone){
+        if(stone.containsKey("ExpensiveCost")){
+            if(Helper.isInteger(stone.containsKey("ExpensiveCost")))
+                return (Integer) stone.get("ExpensiveCost");
+        }
+        return ESFieldManager.STANDARD_AMOUNT;
+    }
+    
+    private List<ExpensiveField> getExpensiveFields(){
+        List<ExpensiveField> output = new ArrayList<ExpensiveField>();
+        for(World world : plugin.getServer().getWorlds()){
+            output.addAll(storageManager.getExpensiveFields(world.getName()));
+        }
+        return output;
     }
 }

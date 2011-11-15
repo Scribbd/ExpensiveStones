@@ -17,6 +17,8 @@ package me.scriblon.plugins.expensivestones.tasks;
 
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 import org.bukkit.block.Chest;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -39,6 +41,17 @@ public class UpKeeper implements Runnable{
     }
     
     public void run() {
+        // Check if field should be disabled
+        if(field.getStatus() == ESStorageManager.ES_DISABLED){
+            field.setSignToOff();
+            // Check if field was in disabled list
+            if(((ExpensiveStones) plugin).getESFieldManager().isInDisabled(field.getField().getId())){
+                ((ExpensiveStones) plugin).getESFieldManager().disableField(field);
+                ExpensiveStones.infoLog("(UpKeeper) field was still on enabled list! On ID: " +
+                        ((ExpensiveStones) plugin).getESFieldManager().isInDisabled(field.getField().getId()));
+            }
+            return;
+        }
         // Check chest for required content
         if(field.chestHasReqContent()){
             field.doUpkeeping();

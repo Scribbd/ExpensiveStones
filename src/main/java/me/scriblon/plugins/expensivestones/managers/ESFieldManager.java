@@ -17,18 +17,23 @@ package me.scriblon.plugins.expensivestones.managers;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import org.bukkit.Material;
 
 /**
  * For adding, deletion and modification off fields.
  * @author 5894913
  */
 public class ESFieldManager {
+    
+    public static Material STANDARD_MATERIAL = Material.REDSTONE;
+    public static long STANDARD_PERIOD = 300L; //as ticks 20t is 1s = 15s
+    public static int STANDARD_AMOUNT = 2; //1 stack goes 470 seconds, 7m
     
     private PreciousStones stones;
     private ESStorageManager storage;
@@ -40,6 +45,12 @@ public class ESFieldManager {
     public ESFieldManager(){
         stones = PreciousStones.getInstance();
         storage = ExpensiveStones.getInstance().getESStorageManager();
+        
+    }
+    
+    //Settings related
+    public void setSettings(Map<Integer, ESFieldSettings> settings){
+        this.settings.putAll(settings);
     }
     
     public ESFieldSettings getESFieldSetting(int iD){
@@ -58,7 +69,7 @@ public class ESFieldManager {
             storage.offerAddition(field);
     }
     
-    public void addFields(Set<ExpensiveField> fields, boolean newField){
+    public void addFields(List<ExpensiveField> fields, boolean newField){
         for(ExpensiveField field : fields){
             this.addField(field, newField);
         }
@@ -83,6 +94,10 @@ public class ESFieldManager {
             if(activeFields.containsKey(id) && field.getStatus() != ESStorageManager.ES_ADMIN){
                 activeFields.remove(id);
                 disabledFields.put(id, field);
+                if(!field.getField().isDisabled())
+                    field.getField().setDisabled(true);
+                else
+                    ExpensiveStones.infoLog("Field was already dissabled! on ID: " + field.getField().getId());
                 field.setStatus(ESStorageManager.ES_DISABLED);
             }
         }       
@@ -94,6 +109,10 @@ public class ESFieldManager {
             if(disabledFields.containsKey(id)){
                 disabledFields.remove(id);
                 activeFields.put(id, field);
+                if(field.getField().isDisabled())
+                    field.getField().setDisabled(false);
+                else
+                    ExpensiveStones.infoLog("Field was already enabled! on ID: " + field.getField().getId());
                 field.setStatus(ESStorageManager.ES_ENABLED);
             }
         } 
@@ -104,11 +123,37 @@ public class ESFieldManager {
             Long id = field.getField().getId();
             if(disabledFields.containsKey(id)){
                 disabledFields.remove(id);
+                ExpensiveStones.infoLog("Field was disabled before OP. on ID: " + field.getField().getId());
             }
             if(!activeFields.containsKey(id)){
                 activeFields.put(id, field);
+                ExpensiveStones.infoLog("Field was enabled before OP. (prob: signeditor) on ID: " + field.getField().getId());
             }
+            if(field.getField().isDisabled()){
+                field.getField().setDisabled(false);
+                ExpensiveStones.infoLog("(PreciousStones)Field was disabled. on ID: " + field.getField().getId());
+            } else
+                ExpensiveStones.infoLog("(PreciousStones)Field was enabled. on ID: " + field.getField().getId());
             field.setStatus(ESStorageManager.ES_ADMIN);
         }
     }
+    
+    //Checkers
+    public boolean isInDisabled(long id){
+        return disabledFields.containsKey(id);
+    }
+    
+    //Getters
+    public Map<Long, ExpensiveField> getActiveFields() {
+        return Collections.unmodifiableMap(activeFields);
+    }
+
+    public Map<Long, ExpensiveField> getDisabledFields() {
+        return Collections.unmodifiableMap(disabledFields);
+    }
+
+    public Map<Integer, ESFieldSettings> getSettings() {
+        return Collections.unmodifiableMap(settings);
+    }
+    
 }

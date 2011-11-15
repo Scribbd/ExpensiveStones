@@ -145,11 +145,15 @@ public class ESStorageManager {
     }
     
     /**
-     * When
+     * 
      * @param expField 
      */
     public void offerDeletion(ExpensiveField expField){
         pendingDeletions.add(expField.getField().getId());
+    }
+    
+    private void offerDeletionOnLoad(Long id){
+        pendingDeletions.add(id);
     }
     
     // Executors
@@ -190,7 +194,11 @@ public class ESStorageManager {
                             Location chest = new Location(thisWorld, chestx, chesty, chestz);
                             Location sign = new Location(thisWorld, signx, signy, signz);
                             Location field = new Location(thisWorld, x, y, z);
-                            
+                            if(PreciousStones.getInstance().getForceFieldManager().getField(field.getBlock()) == null){
+                                log.log(Level.SEVERE, "[ExpensiveStones] Database is invalid, please reinstall! Deletion Offered on ID: " + id);
+                                this.offerDeletionOnLoad(id);
+                                continue;
+                            }
                             fields.add(new ExpensiveField(status, sign, chest, field));
                          
                         }catch(Exception ex){

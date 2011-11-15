@@ -27,6 +27,18 @@ public class Helper {
         return false;
     }
     
+    public static boolean isInteger(Object o){
+        return o instanceof Integer;
+    }
+    
+    public static boolean isString(Object o){
+        return o instanceof String;
+    }
+    
+    public static long convertInteger(int v){
+        return (long) v;
+    }
+    
     /**
      * Escapes single quotes
      * 1 on 1 copy of ExpensiveStones. Credits to their team.
