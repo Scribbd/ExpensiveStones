@@ -34,12 +34,13 @@ public class ESCommandExecutor implements CommandExecutor{
     }
     
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player))
-            return false;
-        
+        if(!(sender instanceof Player)){
+            //TODO Uninstall plugin.
+        }
+                   
         Player player = (Player) sender;
         boolean isAdmin = player.hasPermission("ExpensiveStones.admin");
-        //boolean is
+        //boolean is for special commands
         
         
         return false;

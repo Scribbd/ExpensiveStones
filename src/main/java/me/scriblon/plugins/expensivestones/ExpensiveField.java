@@ -75,6 +75,21 @@ public class ExpensiveField {
         this.settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
     }
     
+    /**
+     * To add dormant Fields
+     * @param field 
+     */
+    public ExpensiveField(Field field){
+        this.field = field;
+        status = ESStorageManager.ES_DISABLED;
+        settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
+        
+        sign = null;
+        signLocation = null;
+        chest = null;
+        chestLocation = null;
+    }
+    
     public Chest getChest() {
         return chest;
     }

@@ -25,3 +25,17 @@ Configuring is simply done by adding the next options to the config.yml from Pre
   - ExpensivePeriod: <int> [S|T] defaults 15s when not present
   - ExpensiveCost: <int> defaults 2 when not present
 You can define the Period by either placing 's' or 't', representing 's'econds or 't'icks. Remember that 20t is 1s servertime.
+
+**Nodes**
+  ExpensiveFields.admin (the ability to create 'admin'-field.)
+  ExpensiveFields.bypass (gives player the ability to ignore the ExpensiveField Plugin AKA insta-admin-field)
+
+**Commands**
+  NOT YET IMPLEMENTED
+  /es bypass (toggles bypass)
+  /es admin <iD> (toggles admin on iD)
+  /es admin point (toggles admin on the block being targeted)
+  
+  CONSOLE ONLY
+  expensiveStones uninstall -true (deletes EVERYTHING related to ExpensiveFields)
+  expensiveStones purge -true (drops the expensiveStone table)

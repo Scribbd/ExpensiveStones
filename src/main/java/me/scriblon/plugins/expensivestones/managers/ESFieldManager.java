@@ -42,6 +42,8 @@ public class ESFieldManager {
     private Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
     private Map<Long, ExpensiveField> activeFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
     private Map<Long, ExpensiveField> disabledFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
+    //TODO redesign this, bloated and not needen. (phead.vector.Field knows when it is dissabled.)
+    //Might switch over to Map<Integer (status), Map<Long, ExpensiveField>>
     private Map<Long, Long> taskLink = Collections.synchronizedMap(new LinkedHashMap<Long, Long>());
     
     public ESFieldManager(){
@@ -152,6 +154,12 @@ public class ESFieldManager {
         return disabledFields.containsKey(id);
     }
     
+    public boolean isKnown(long id){
+        if(disabledFields.containsKey(id) && activeFields.containsKey(id))
+            ExpensiveStones.infoLog("(isKnown) Field found in both maps! on id: " + id);
+        return disabledFields.containsKey(id) || activeFields.containsKey(id);
+    }
+    
     //Getters
     public Map<Long, ExpensiveField> getActiveFields() {
         return Collections.unmodifiableMap(activeFields);
@@ -163,6 +171,12 @@ public class ESFieldManager {
 
     public Map<Integer, ESFieldSettings> getSettings() {
         return Collections.unmodifiableMap(settings);
+    }
+    
+    public Map<Long, ExpensiveField> getKnownExpensiveFields(){
+        Map<Long, ExpensiveField> allFields = disabledFields;
+        allFields.putAll(activeFields);
+        return Collections.unmodifiableMap(allFields);
     }
     
     //!! debug feature Keeping track of all Tasks

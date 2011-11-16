@@ -28,7 +28,8 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.plugin.Plugin;
+
+//TODO place permissions as public statics somewhere else!
 
 /**
  * ExpensiveStones Listener for sign place event and the placing of FieldBlocks
@@ -37,7 +38,7 @@ import org.bukkit.plugin.Plugin;
 public class ESBlockListener extends BlockListener{
     
     private PreciousStones stones;
-    private Plugin plugin;
+    private ExpensiveStones plugin;
     
     public ESBlockListener(){
         stones = PreciousStones.getInstance();
@@ -57,10 +58,19 @@ public class ESBlockListener extends BlockListener{
         
         if(!event.getLine(1).equalsIgnoreCase("admin")){
             if(!player.hasPermission("ExpensiveStones.admin")){
-                //TODO transfer field over to preciousStone DB.
+                //Check if block is a expensiveField
+                Block block = BlockUtil.getFieldStone(event.getBlock());
+                if(block == null){
+                    player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: No Field-Block Found");
+                    event.setCancelled(true);
+                    return;
+                }
+                //Check if field is known
+                Field eventField = stones.getForceFieldManager().getField(block);
+                //
                 //TODO register field in normal plugin.
             }else{
-                player.sendMessage(ChatColor.YELLOW + "You don't have permission to create an admin-field");
+                player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: You don't have permission to create an admin-field");
                 event.setCancelled(true);
                 return;
             }
@@ -91,6 +101,24 @@ public class ESBlockListener extends BlockListener{
         if(event.isCancelled())
             return;
         
+        //Check if block in and PSField
+        if(!stones.getForceFieldManager().isField(event.getBlock())) 
+            return;
+        //Disable if player has bypass permissions
+        Player player = event.getPlayer();
+        if(player.hasPermission("ExpensiveStones.bypass")){
+            player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Bypassed! Field acts as PreciousStone.");
+            return;
+        }
+        //Disable Field
+        Block block = event.getBlock();
+        if(stones.getForceFieldManager().isField(block)){
+            Field field = stones.getForceFieldManager().getField(block);
+            ExpensiveField expField = new ExpensiveField(field);
+            field.setDisabled(true);
+            plugin.getESFieldManager().addField(expField, true);
+            player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: stone detected! Stone is disabled.");
+        }
     }
 
     @Override

@@ -15,7 +15,9 @@
  */
 package me.scriblon.plugins.expensivestones.utils;
 
-import java.util.List;
+import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -68,7 +70,7 @@ public class BlockUtil {
             for(int y = -1; y<2; y++){
                 for(int z = -1; z<2; z++){
                     block = sign.getRelative(x, y, z);
-                    if(isField(block)){
+                    if(isField(block) && !isKnownField(block)){
                         return block;
                     }
                 }
@@ -83,11 +85,11 @@ public class BlockUtil {
     }
     
     public static boolean isField(Block block){
-        return false;
+        return PreciousStones.getInstance().getSettingsManager().isFieldType(block.getType());
     }
     
-    public static boolean isExpensiveField(List ExpensiveFields){
-        return false;
+    public static boolean isKnownField(Block field){
+        return ExpensiveStones.getInstance().getESFieldManager().isKnown(((Field) field).getId());
     }
-
+    
 }
