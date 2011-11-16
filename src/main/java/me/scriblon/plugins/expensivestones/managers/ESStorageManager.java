@@ -42,8 +42,9 @@ import org.bukkit.World;
  */
 public class ESStorageManager {
     
-    public static final int ES_ENABLED = 0;
-    public static final int ES_DISABLED = 1;
+    public static final int ES_DORMANT = -1;
+    public static final int ES_DISABLED = 0;
+    public static final int ES_ENABLED = 1;
     public static final int ES_ADMIN = 2;
     
     private PreciousStones stones;
@@ -99,48 +100,22 @@ public class ESStorageManager {
         pendingAdditions.add(expField);
     }
     
-    public void offerToggleOn(ExpensiveField expField){
+    public void offerStatusUpdate(ExpensiveField expField){
         long id = expField.getField().getId();
         if(!pendingUpdates.containsKey(id))
-            pendingStatusMutations.put(expField.getField().getId(), ES_ENABLED);
+            pendingStatusMutations.put(expField.getField().getId(), expField.getStatus());
         else
-            expField.setStatus(ES_ENABLED);
-    }
-    
-    public void offerToggleOff(ExpensiveField expField){
-        long id = expField.getField().getId();
-        if(!pendingUpdates.containsKey(id))
-            pendingStatusMutations.put(expField.getField().getId(), ES_DISABLED);
-        else
-            expField.setStatus(ES_DISABLED);
-    }
-    
-    public void offerToggleOp(ExpensiveField expField){
-        long id = expField.getField().getId();
-        if(!pendingUpdates.containsKey(id))
-            pendingStatusMutations.put(expField.getField().getId(), ES_ADMIN);
-        else
-            expField.setStatus(ES_ADMIN);
-    }
-    
-    public boolean setToggle(ExpensiveField expField, int status){
-        if(status == ES_ENABLED || status == ES_ADMIN || status == ES_DISABLED){
-            pendingStatusMutations.put(expField.getField().getId(), status);
-            return true;
-        }
-        return false;
+            pendingUpdates.put(expField.getField().getId(), expField);
     }
     
     public void offerUpdatedField(ExpensiveField expField){
         Long id = expField.getField().getId();
-        if(pendingStatusMutations.containsKey(id)){
-            expField.setStatus(pendingStatusMutations.get(id));
+        if(pendingStatusMutations.containsKey(id))
             pendingStatusMutations.remove(id);
-        }
         pendingUpdates.put(id, expField);
     }
     
-    private boolean checkWholeField(ExpensiveField expField){
+    public boolean checkWholeField(ExpensiveField expField){
         return pendingUpdates.containsKey(expField.getField().getId());
     }
     
@@ -175,12 +150,16 @@ public class ESStorageManager {
                         try{
                             long id = res.getLong("id");
                             int status = res.getInt("status");
-                            int chestx = res.getInt("chestx");
-                            int chesty = res.getInt("chesty");
-                            int chestz = res.getInt("chestz");
-                            int signx = res.getInt("signx");
-                            int signy = res.getInt("signy");
-                            int signz = res.getInt("signz");
+                            int chestx = 0, chesty = 0, chestz = 0, signx = 0, signy = 0, signz = 0;
+                            //Check dormant
+                            if(status != ES_DORMANT){
+                                chestx = res.getInt("chestx");
+                                chesty = res.getInt("chesty");
+                                chestz = res.getInt("chestz");
+                                signx = res.getInt("signx");
+                                signy = res.getInt("signy");
+                                signz = res.getInt("signz");
+                            }
                             int x = res.getInt("x");
                             int y = res.getInt("y");
                             int z = res.getInt("z");
@@ -195,7 +174,7 @@ public class ESStorageManager {
                             Location sign = new Location(thisWorld, signx, signy, signz);
                             Location field = new Location(thisWorld, x, y, z);
                             if(PreciousStones.getInstance().getForceFieldManager().getField(field.getBlock()) == null){
-                                log.log(Level.SEVERE, "[ExpensiveStones] Database is invalid, please reinstall! Deletion Offered on ID: " + id);
+                                log.log(Level.SEVERE, "[ExpensiveStones] Database is invalid! Deletion Offered on ID: " + id);
                                 this.offerDeletionOnLoad(id);
                                 continue;
                             }

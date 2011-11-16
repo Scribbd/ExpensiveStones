@@ -75,7 +75,7 @@ public class ESBlockListener extends BlockListener{
                     
                 }
                 //TODO register field in normal plugin.
-                manager.adminESField(field);
+                manager.setAdminField(field);
             }else{
                 player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: You don't have permission to create an admin-field");
                 event.setCancelled(true);

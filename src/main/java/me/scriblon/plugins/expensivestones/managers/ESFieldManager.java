@@ -24,6 +24,7 @@ import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -41,10 +42,10 @@ public class ESFieldManager {
     private ESStorageManager storage;
     
     private Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(new LinkedHashMap<Integer, ESFieldSettings>());
+    private Map<Location, ExpensiveField> dormantFields = Collections.synchronizedMap(new LinkedHashMap<Location, ExpensiveField>());
     private Map<Long, ExpensiveField> activeFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
     private Map<Long, ExpensiveField> disabledFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
-    //TODO redesign this, bloated and not needen. (phead.vector.Field knows when it is dissabled.)
-    //Might switch over to Map<Integer (status), Map<Long, ExpensiveField>>
+    //Debug
     private Map<Long, Long> taskLink = Collections.synchronizedMap(new LinkedHashMap<Long, Long>());
     
     public ESFieldManager(){
@@ -66,9 +67,11 @@ public class ESFieldManager {
     
     //Adders
     public void addField(ExpensiveField field, boolean newField){
-        if(field.getStatus() == ESStorageManager.ES_DISABLED)
+        if(field.isDisabled())
             disabledFields.put(field.getField().getId(), field);
-        else{
+        else if(field.isDormant()){
+        ;
+        } else {
             activeFields.put(field.getField().getId(), field);
         }
         if(newField && field.getSign() != null){
@@ -91,58 +94,115 @@ public class ESFieldManager {
                 activeFields.remove(id);
             if(disabledFields.containsKey(id))
                 disabledFields.remove(id);
+            if(dormantFields.containsKey(field.getField().getLocation()))
+                dormantFields.remove(field.getField().getLocation());
             storage.offerDeletion(field);
         }
     }
     
     //Togglers
     public void disableField(ExpensiveField field){
+        if(field.isAdmin()){
+            ExpensiveStones.infoLog("(PreciousStones:Disable)Field is Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
+            return;
+        }
         synchronized(this){
             Long id = field.getField().getId();
-            if(activeFields.containsKey(id) && field.getStatus() != ESStorageManager.ES_ADMIN){
+            if(activeFields.containsKey(id)){
                 activeFields.remove(id);
-                disabledFields.put(id, field);
-                if(!field.getField().isDisabled())
-                    field.getField().setDisabled(true);
-                else
-                    ExpensiveStones.infoLog("Field was already dissabled! on ID: " + field.getField().getId());
-                field.setStatus(ESStorageManager.ES_DISABLED);
+                ExpensiveStones.infoLog("(PreciousStones:Disable)Field was active before. on ID: " + field.getField().getId());
             }
+            if(dormantFields.containsKey(field.getField().getLocation())){
+                dormantFields.remove(field.getField().getLocation());
+                ExpensiveStones.infoLog("(PreciousStones:Disable)Field was dormant before. on ID: " + field.getField().getId());
+            }
+            if(!disabledFields.containsKey(id)){
+                disabledFields.put(id, field);
+            } else
+                ExpensiveStones.infoLog("(PreciousStones:Disable)Field was already disabled. on ID: " + field.getField().getId());
+            
+            field.setStatus(ESStorageManager.ES_DISABLED);
+            field.setFieldOFF();
+            storage.offerStatusUpdate(field);
         }       
     }
     
     public void enableField(ExpensiveField field){
+        if(field.isAdmin()){
+            ExpensiveStones.infoLog("(PreciousStones:Enable)Field is Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
+            return;
+        }
         synchronized(this){
             Long id = field.getField().getId();
-            if(disabledFields.containsKey(id)){
-                disabledFields.remove(id);
-                activeFields.put(id, field);
-                if(field.getField().isDisabled())
-                    field.getField().setDisabled(false);
-                else
-                    ExpensiveStones.infoLog("Field was already enabled! on ID: " + field.getField().getId());
-                field.setStatus(ESStorageManager.ES_ENABLED);
+            if(dormantFields.containsKey(field.getField().getLocation())){
+                dormantFields.remove(field.getField().getLocation());
+                ExpensiveStones.infoLog("(PreciousStones:Enable)Field was dormant before Enable. on ID: " + field.getField().getId());
             }
-        } 
-    }
-    
-    public void adminESField(ExpensiveField field){
-        synchronized(this){
-            Long id = field.getField().getId();
             if(disabledFields.containsKey(id)){
                 disabledFields.remove(id);
-                ExpensiveStones.infoLog("Field was disabled before OP. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(PreciousStones:Enable)Field was disabled before Enable. on ID: " + field.getField().getId());
             }
             if(!activeFields.containsKey(id)){
                 activeFields.put(id, field);
-                ExpensiveStones.infoLog("Field was enabled before OP. (prob: signeditor) on ID: " + field.getField().getId());
-            }
-            if(field.getField().isDisabled()){
-                field.getField().setDisabled(false);
-                ExpensiveStones.infoLog("(PreciousStones)Field was disabled. on ID: " + field.getField().getId());
             } else
-                ExpensiveStones.infoLog("(PreciousStones)Field was enabled. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(PreciousStones:Enable)Field was already active before Enable. on ID: " + field.getField().getId());
+
+            field.setStatus(ESStorageManager.ES_ENABLED);
+            field.setFieldON();
+            storage.offerStatusUpdate(field);
+        } 
+    }
+    
+    public void setAdminField(ExpensiveField field){
+        if(field.isAdmin()){
+            ExpensiveStones.infoLog("(PreciousStones:Admin)Field is already Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
+            return;
+        }
+        synchronized(this){
+            Long id = field.getField().getId();
+            if(disabledFields.containsKey(id)){
+                disabledFields.remove(id);
+                ExpensiveStones.infoLog("(PreciousStones:Admin)Field was disabled before OP. on ID: " + field.getField().getId());
+            }
+            if(dormantFields.containsKey(field.getField().getLocation())){
+                dormantFields.remove(field.getField().getLocation());
+                ExpensiveStones.infoLog("(PreciousStones:Admin)Field was dormant before OP. on ID: " + field.getField().getId());
+            }
+            if(!activeFields.containsKey(id))
+                activeFields.put(id, field);
+            else
+                ExpensiveStones.infoLog("(PreciousStones:Admin)Field was enabled before OP. (prob: signeditor) on ID: " + field.getField().getId());
+            
             field.setStatus(ESStorageManager.ES_ADMIN);
+            field.setFieldON();
+            storage.offerStatusUpdate(field);
+        }
+    }
+    
+    public void setDormantField(ExpensiveField field){
+        if(field.isAdmin()){
+            ExpensiveStones.infoLog("(PreciousStones:Dormant)Field is Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
+            return;
+        }
+        synchronized(this){
+            Long id = field.getField().getId();
+            if(disabledFields.containsKey(id)){
+                disabledFields.remove(id);
+                ExpensiveStones.infoLog("(PreciousStones:Dorm)Field was disabled before Dromant. on ID: " + field.getField().getId());
+            }
+            if(activeFields.containsKey(id)){
+                activeFields.remove(id);
+                ExpensiveStones.infoLog("(PreciousStones:Dorm)Field was enabled before Dromant. on ID: " + field.getField().getId());
+            }
+            if(!dormantFields.containsKey(field.getField().getLocation())){
+                dormantFields.put(field.getField().getLocation(), field);
+                ExpensiveStones.infoLog("(PreciousStones:Dorm)Field was disabled before Dromant. on ID: " + field.getField().getId());
+            } else 
+                ExpensiveStones.infoLog("(PreciousStones:Dorm)Field already dormant before Dromant. on ID: " + field.getField().getId());
+            
+            field.setStatus(ESStorageManager.ES_DORMANT);
+            field.setFieldOFF();
+            storage.offerUpdatedField(field);
         }
     }
     

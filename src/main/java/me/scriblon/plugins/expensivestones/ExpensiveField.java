@@ -65,12 +65,17 @@ public class ExpensiveField {
     
     public ExpensiveField(int status, Location signLocation, Location chestLocation, Location fieldLocation){
         this.status = status;
-        this.signLocation = signLocation;
-        this.chestLocation = chestLocation;
-        
-        this.sign = (Sign) signLocation.getBlock();
-        this.chest = (Chest) chestLocation.getBlock();
-        
+        if(status != ESStorageManager.ES_DORMANT){
+            this.signLocation = signLocation;
+            this.chestLocation = chestLocation;
+            this.sign = (Sign) signLocation.getBlock();
+            this.chest = (Chest) chestLocation.getBlock();
+        } else{
+            this.signLocation = null;
+            this.chestLocation = null;
+            this.sign = null;
+            this.chest = null;
+        }
         this.field = PreciousStones.getInstance().getForceFieldManager().getField(fieldLocation.getBlock());
         this.settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
     }
@@ -82,7 +87,7 @@ public class ExpensiveField {
      */
     public ExpensiveField(Field field){
         this.field = field;
-        status = ESStorageManager.ES_DISABLED;
+        status = ESStorageManager.ES_DORMANT;
         settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
         
         field.setDisabled(true);
@@ -121,6 +126,13 @@ public class ExpensiveField {
         if(status == ESStorageManager.ES_ENABLED || status == ESStorageManager.ES_ADMIN || status == ESStorageManager.ES_DISABLED){
             this.status = status;
             return true;
+        }else if(status == ESStorageManager.ES_DORMANT){
+            this.status = status;
+            sign = null;
+            signLocation = null;
+            chest = null;
+            chestLocation = null;
+            
         }
         return false;
     }
@@ -174,6 +186,30 @@ public class ExpensiveField {
         return status == ESStorageManager.ES_ADMIN;
     }
     
+    public boolean isDormant(){
+        return status == ESStorageManager.ES_DORMANT;
+    }
+    
+    public boolean isActive(){
+        return status == ESStorageManager.ES_ENABLED;
+    }
+    
+    public boolean isDisabled(){
+        return status == ESStorageManager.ES_DISABLED;
+    }
+    
+    //Field Toglles
+    public void setFieldON(){
+        field.setDisabled(true);
+    }
+    
+    public void setFieldOFF(){
+        field.setDisabled(false);
+    }
+    
+    public boolean isFieldDisabled(){
+        return field.isDisabled();
+    }
     //Pirvates
     private boolean isCorrectValues(Block sign, Block chest) throws UnknownTypeException{
         if(BlockUtil.isSign(sign)){
