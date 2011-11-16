@@ -89,7 +89,7 @@ public class BlockUtil {
     }
     
     public static boolean isKnownField(Block field){
-        return ExpensiveStones.getInstance().getESFieldManager().isKnown(((Field) field).getId());
+        return ExpensiveStones.getInstance().getESFieldManager().isKnown(field);
     }
     
 }

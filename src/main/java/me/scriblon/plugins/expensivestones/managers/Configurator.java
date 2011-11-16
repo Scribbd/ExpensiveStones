@@ -129,8 +129,11 @@ public class Configurator {
     
     private Material extractMaterial(LinkedHashMap<String, Object> stone){
         if (stone.containsKey("ExpensiveMaterial")){
-            if(Helper.isString(stone.get("ExpensiveMaterial")))
-                return (Material) stone.get("ExpensiveMaterial");
+            if(Helper.isString(stone.get("ExpensiveMaterial"))){
+                return Material.getMaterial((String) stone.get("ExpensiveMaterial"));
+            }else if(Helper.isInteger(stone.get("ExpensiveMaterial"))){
+                return Material.getMaterial(Integer.parseInt((String) stone.get("ExpensiveMaterial")));
+            }
         }
         return ESFieldManager.STANDARD_MATERIAL;
     }

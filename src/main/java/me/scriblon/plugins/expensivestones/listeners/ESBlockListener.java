@@ -22,6 +22,7 @@ import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -45,7 +46,7 @@ public class ESBlockListener extends BlockListener{
     public ESBlockListener(){
         stones = PreciousStones.getInstance();
         plugin = ExpensiveStones.getInstance();
-        manager = manager;
+        manager = plugin.getESFieldManager();
     }
     
     
@@ -72,7 +73,7 @@ public class ESBlockListener extends BlockListener{
                 ExpensiveField field = manager.getExpensiveField(block);
                 //Check if field is already active
                 if(manager.isKnown()){
-                    
+                    //FIXME
                 }
                 //TODO register field in normal plugin.
                 manager.setAdminField(field);
@@ -102,19 +103,16 @@ public class ESBlockListener extends BlockListener{
         if(event.isCancelled())
             return;
         
-        Block block = event.getBlock();
-        //When block is no expensive type, then plugin will just continue
-        if(!manager.isExpensiveType(block.getTypeId()))
+        final Block block = event.getBlock();
+        // SignCheck
+        if(block.getType() == Material.SIGN){
+            //TODO handle dormanting of field
             return;
-        //Also do nothing when block is not known or
-        if(!manager.getExpensiveField(block).isAdmin())
-            return;
-        
-        //Delete tracks of block
-        ExpensiveField field = manager.getExpensiveField(block);
-        manager.removeField(field);
-        //Debug-feature
-        
+        }
+        // BlockCheck
+        if(stones.getSettingsManager().isFieldType(block)){
+            //TODO handle deletion of field
+        }  
     }
 
     @Override
@@ -126,13 +124,13 @@ public class ESBlockListener extends BlockListener{
         if(!stones.getForceFieldManager().isField(event.getBlock())) 
             return;
         //Do nothing when player has bypass permissions
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
         if(player.hasPermission("ExpensiveStones.bypass")){
             player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Bypassed! Field acts as PreciousStone.");
             return;
         }
         //Disable Field
-        Block block = event.getBlock();
+        final Block block = event.getBlock();
         if(stones.getForceFieldManager().isField(block)){
             ExpensiveField expField = new ExpensiveField(stones.getForceFieldManager().getField(block));
             manager.addField(expField, true);
