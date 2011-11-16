@@ -25,6 +25,7 @@ import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 /**
  * For adding, deletion and modification off fields.
@@ -65,12 +66,13 @@ public class ESFieldManager {
     
     //Adders
     public void addField(ExpensiveField field, boolean newField){
-        if(field.getStatus()== ESStorageManager.ES_DISABLED)
+        if(field.getStatus() == ESStorageManager.ES_DISABLED)
             disabledFields.put(field.getField().getId(), field);
         else{
             activeFields.put(field.getField().getId(), field);
         }
-        if(newField){
+        if(newField && field.getSign() != null){
+            //TODO dormant fields project
             storage.offerAddition(field);
         }
     }
@@ -160,6 +162,14 @@ public class ESFieldManager {
         return disabledFields.containsKey(id) || activeFields.containsKey(id);
     }
     
+    public boolean isKnown(Block block){
+        return isKnown(getExpensiveField(block).getField().getId());
+    }
+    
+    public boolean isExpensiveType(int type){
+        return settings.containsKey(type);
+    }
+    
     //Getters
     public Map<Long, ExpensiveField> getActiveFields() {
         return Collections.unmodifiableMap(activeFields);
@@ -173,10 +183,17 @@ public class ESFieldManager {
         return Collections.unmodifiableMap(settings);
     }
     
+    //Advanced Getters
     public Map<Long, ExpensiveField> getKnownExpensiveFields(){
         Map<Long, ExpensiveField> allFields = disabledFields;
         allFields.putAll(activeFields);
         return Collections.unmodifiableMap(allFields);
+    }
+    
+    public ExpensiveField getExpensiveField(Block block){
+        ExpensiveField output = null;
+        //TODO HELUP!
+        return output;
     }
     
     //!! debug feature Keeping track of all Tasks

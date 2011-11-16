@@ -76,13 +76,16 @@ public class ExpensiveField {
     }
     
     /**
-     * To add dormant Fields
+     * To add dormant (new) Fields.
+     * Also disables field automatically!
      * @param field 
      */
     public ExpensiveField(Field field){
         this.field = field;
         status = ESStorageManager.ES_DISABLED;
         settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
+        
+        field.setDisabled(true);
         
         sign = null;
         signLocation = null;
@@ -164,6 +167,11 @@ public class ExpensiveField {
     
     public boolean chestHasReqContent(){
         return chest.getInventory().contains(settings.getMaterial());
+    }
+    
+    //Checkers
+    public boolean isAdmin(){
+        return status == ESStorageManager.ES_ADMIN;
     }
     
     //Pirvates

@@ -83,10 +83,11 @@ public class Configurator {
         fieldManager.addFields(expensiveFields, false);
             // Schedule active Field Tasks
         for(Entry field : fieldManager.getActiveFields().entrySet()){
-            UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
-            long iD = keeper.scheduleMeFreeTick();
-            if(!fieldManager.setTask(keeper.scheduleMeFreeTick(), (ExpensiveField) field.getValue()))
-                keeper.stopMe();
+            if(((ExpensiveField) field).isAdmin()){
+                UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
+                if(!fieldManager.setTask(keeper.scheduleMeFreeTick(), (ExpensiveField) field.getValue()))
+                    keeper.stopMe();
+            }
         }
     }
     

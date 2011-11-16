@@ -50,6 +50,7 @@ public class UpKeeper implements Runnable{
                 ExpensiveStones.infoLog("(UpKeeper) field was still on enabled list! On ID: " +
                         manager.isInDisabled(field.getField().getId()));
             }
+            this.stopMe();
             return;
         }
         // Check chest for required content
