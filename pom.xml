@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>org.PreciousStones</groupId>
-            <artifactId>org.PreciousStones</artifactId>
+            <artifactId>PreciousStones</artifactId>
             <version>7.0.5</version>
         </dependency>
     </dependencies>

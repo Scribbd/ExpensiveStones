@@ -39,3 +39,9 @@ You can define the Period by either placing 's' or 't', representing 's'econds o
   CONSOLE ONLY
   expensiveStones uninstall -true (deletes EVERYTHING related to ExpensiveFields)
   expensiveStones purge -true (drops the expensiveStone table)
+
+**Dev notes*
+FieldTypes:
+ -Active
+ -Disabled (dormant for new fields)
+ -Admin (ignored on startup)

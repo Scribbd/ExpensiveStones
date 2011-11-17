@@ -17,7 +17,6 @@ package me.scriblon.plugins.expensivestones.utils;
 
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
-import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -64,11 +63,13 @@ public class BlockUtil {
      * @param sign
      * @return gets block
      */
-    public static Block getFieldStone(Block sign){
+    public static Block getNewFieldStone(Block sign){
         Block block;
         for(int x = -1; x<2; x++){
             for(int y = -1; y<2; y++){
                 for(int z = -1; z<2; z++){
+                    if(x==0 && y==0 && z==0)
+                        continue;
                     block = sign.getRelative(x, y, z);
                     if(isField(block) && !isKnownField(block)){
                         return block;
@@ -76,10 +77,21 @@ public class BlockUtil {
                 }
             }
         }
-        
-        block = sign.getRelative(0,0,2);
-        if(isField(block)){
-            return block;
+        //Not the most effective way, but is a way.
+        //Get 2 block away from sign.
+        for(int x = -2; x < 3; x = x + 4){
+            block = sign.getRelative(0,0,x);
+            if(isField(block) && !isKnownField(block)){
+                return block;
+            }
+            block = sign.getRelative(0,x,0);
+            if(isField(block) && !isKnownField(block)){
+                return block;
+            }
+            block = sign.getRelative(x,0,0);
+            if(isField(block) && !isKnownField(block)){
+                return block;
+            }
         }
         return null;
     }

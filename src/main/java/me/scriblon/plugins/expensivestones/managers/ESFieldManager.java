@@ -107,19 +107,19 @@ public class ESFieldManager {
             return;
         }
         synchronized(this){
-            Long id = field.getField().getId();
+            final long id = field.getField().getId();
             if(activeFields.containsKey(id)){
                 activeFields.remove(id);
-                ExpensiveStones.infoLog("(Disable)Field was active before. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Disable)Field was active before. on ID: " + id);
             }
             if(dormantFields.containsKey(field.getField().getLocation())){
                 dormantFields.remove(field.getField().getLocation());
-                ExpensiveStones.infoLog("(Disable)Field was dormant before. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Disable)Field was dormant before. on ID: " + id);
             }
             if(!disabledFields.containsKey(id)){
                 disabledFields.put(id, field);
             } else
-                ExpensiveStones.infoLog("(Disable)Field was already disabled. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Disable)Field was already disabled. on ID: " + id);
             
             field.setStatus(ESStorageManager.ES_DISABLED);
             field.setFieldOFF();
@@ -133,19 +133,19 @@ public class ESFieldManager {
             return;
         }
         synchronized(this){
-            Long id = field.getField().getId();
+            final long id = field.getField().getId();
             if(dormantFields.containsKey(field.getField().getLocation())){
                 dormantFields.remove(field.getField().getLocation());
-                ExpensiveStones.infoLog("(Enable)Field was dormant before Enable. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Enable)Field was dormant before Enable. on ID: " + id);
             }
             if(disabledFields.containsKey(id)){
                 disabledFields.remove(id);
-                ExpensiveStones.infoLog("(Enable)Field was disabled before Enable. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Enable)Field was disabled before Enable. on ID: " + id);
             }
             if(!activeFields.containsKey(id)){
                 activeFields.put(id, field);
             } else
-                ExpensiveStones.infoLog("(Enable)Field was already active before Enable. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Enable)Field was already active before Enable. on ID: " + id);
 
             field.setStatus(ESStorageManager.ES_ENABLED);
             field.setFieldON();
@@ -159,19 +159,19 @@ public class ESFieldManager {
             return;
         }
         synchronized(this){
-            Long id = field.getField().getId();
+            final long id = field.getField().getId();
             if(disabledFields.containsKey(id)){
                 disabledFields.remove(id);
-                ExpensiveStones.infoLog("(Admin)Field was disabled before OP. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Admin)Field was disabled before OP. on ID: " + id);
             }
             if(dormantFields.containsKey(field.getField().getLocation())){
                 dormantFields.remove(field.getField().getLocation());
-                ExpensiveStones.infoLog("(Admin)Field was dormant before OP. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Admin)Field was dormant before OP. on ID: " + id);
             }
             if(!activeFields.containsKey(id))
                 activeFields.put(id, field);
             else
-                ExpensiveStones.infoLog("(Admin)Field was enabled before OP. (prob: signeditor) on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Admin)Field was enabled before OP. (prob: signeditor) on ID: " + id);
             
             field.setStatus(ESStorageManager.ES_ADMIN);
             field.setFieldON();
@@ -185,20 +185,20 @@ public class ESFieldManager {
             return;
         }
         synchronized(this){
-            Long id = field.getField().getId();
+            final long id = field.getField().getId();
             if(disabledFields.containsKey(id)){
                 disabledFields.remove(id);
-                ExpensiveStones.infoLog("(Dormant)Field was disabled before Dromant. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Dormant)Field was disabled before Dromant. on ID: " + id);
             }
             if(activeFields.containsKey(id)){
                 activeFields.remove(id);
-                ExpensiveStones.infoLog("(Dormant)Field was enabled before Dromant. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Dormant)Field was enabled before Dromant. on ID: " + id);
             }
             if(!dormantFields.containsKey(field.getField().getLocation())){
                 dormantFields.put(field.getField().getLocation(), field);
-                ExpensiveStones.infoLog("(Dormant)Field was disabled before Dromant. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Dormant)Field was disabled before Dromant. on ID: " + id);
             } else 
-                ExpensiveStones.infoLog("(Dormant)Field already dormant before Dromant. on ID: " + field.getField().getId());
+                ExpensiveStones.infoLog("(Dormant)Field already dormant before Dromant. on ID: " + id);
             
             field.setStatus(ESStorageManager.ES_DORMANT);
             field.setFieldOFF();
