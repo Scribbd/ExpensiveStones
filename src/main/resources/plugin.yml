@@ -1,5 +1,5 @@
 author: Scriblon
-database: true
+database: false
 description: Extension on PreciousStones. Adding upkeep cost in form of a configurable
   item.
 generator: http://dinnerbone.com/minecraft/tools/pluginator/

@@ -15,7 +15,6 @@
  */
 package me.scriblon.plugins.expensivestones.utils;
 
-import java.io.File;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
 import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;

@@ -69,30 +69,43 @@ public class ESStorageManager {
     
     public void addExpensiveTableToDatabase(){
         if(stones.getSettingsManager().isUseMysql()){
+            ExpensiveStones.infoLog("Using MySQL to create table.");
             if(db.checkConnection()){
-                db.execute("CREATE TABLE IF NOT EXISTS 'exstone_fields' ("
-                    + "'id' bigint(20) NOT NULL, "
-                    + "'status' tinyint NULL default 0, "
-                    + "'chestx' int(11) default NULL, 'chesty' int(11) default NULL, 'chestz' int(11) default NULL, "
-                    + "'signx' int(11) default NULL, 'signy' int(11) default NULL, signz' int(11) default NULL, "
-                    + "'world' varchar(25) default NULL, "
-                    + "CONSTRAINT pk_exst_dis PRIMARY KEY ('id'), "
-                    + "CONSTRAINT uq_exst UNIQUE KEY ('chestx', 'chesty', 'chestz', 'signx', 'signy', 'signz', 'world') "
-                    + "CONSTRAINT fk_extdis_pfield FOREIGN KEY ('id') REFERENCES pstone_fields ('id'))");
+                db.execute("CREATE TABLE IF NOT EXISTS `exstone_fields` ("
+                    + "`id` bigint(20) NOT NULL, "
+                    + "`status` tinyint NULL default 0, "
+                    + "`chestx` int(11) default NULL, "
+                        + "`chesty` int(11) default NULL, "
+                        + "`chestz` int(11) default NULL, "
+                    + "`signx` int(11) default NULL, "
+                        + "`signy` int(11) default NULL, "
+                        + "`signz` int(11) default NULL, "
+                    + "`world` varchar(25) default NULL, "
+                    + "CONSTRAINT pk_exst_dis PRIMARY KEY (`id`), "
+                    + "CONSTRAINT uq_exst UNIQUE KEY (`chestx`, `chesty`, `chestz`, `signx`, `signy`, `signz`, `world`) "
+                    + "CONSTRAINT fk_extdis_pfield FOREIGN KEY (`id`) REFERENCES pstone_fields (`id`))");
+                ExpensiveStones.infoLog("MySQL table should be created.");
             }else{
-                log.log(Level.INFO, "[ExpensiveStones] MySQL Connection Failed");
+                log.log(Level.INFO, "MySQL Connection Failed");
             }
         }else{
+            ExpensiveStones.infoLog("Using SQLite to create table.");
             if(db.checkConnection()){
-                db.execute("CREATE TABLE IF NOT EXISTS 'exstone_fields' ("
-                    + "'status' tinyint NULL default 0, "
-                    + "'chestx' int(11) default NULL, 'chesty' int(11) default NULL, 'chestz' int(11) default NULL, "
-                    + "'signx' int(11) default NULL, 'signy' int(11) default NULL, signz' int(11) default NULL, "
-                    + "'world' varchar(25) default NULL, "
-                    + "CONSTRAINT uq_exst UNIQUE KEY ('chestx', 'chesty', 'chestz', 'signx', 'signy', 'signz', 'world')"
-                    + ")");
+                db.execute("CREATE TABLE IF NOT EXISTS `exstone_fields` ("
+                    + "`id` INTEGER PRIMARY KEY, "
+                    + "`status` int(2) NULL default 0, "
+                    + "`chestx` int(11) default NULL, "
+                        + "`chesty` int(11) default NULL, "
+                        + "`chestz` int(11) default NULL, "
+                    + "`signx` int(11) default NULL, "
+                        + "`signy` int(11) default NULL, "
+                        + "`signz` int(11) default NULL, "
+                    + "`world` varchar(25) default NULL, "
+                    + "CONSTRAINT uq_exst UNIQUE KEY ( `chestx` , `chesty` , `chestz` , `signx` , `signy` , `signz` , `world` )"
+                    + " )");
+                ExpensiveStones.infoLog("SQLite table should be created.");
             }else{
-                log.log(Level.INFO, "[ExpensiveStones] SQLite Connection Failed");
+                ExpensiveStones.infoLog("SQLite Connection Failed");
             }
         }
     }
@@ -145,7 +158,7 @@ public class ESStorageManager {
                     + "pstone_fields.world as world, "
                     + "x, y, z "
                     + "FROM exstone_fields INNER JOIN pstone_fields ON pstone_fields.id = exstone_fields.id"
-                    + "WHERE world = '" + Helper.escapeQuotes(world) + "';");
+                    + "WHERE world = `" + Helper.escapeQuotes(world) + "`;");
             if(res != null){
                 try{
                     while(res.next()){
@@ -168,7 +181,7 @@ public class ESStorageManager {
                             String recordedWorld = res.getString("world");
                             
                             if(world.equalsIgnoreCase(recordedWorld) && world != null)
-                                ExpensiveStones.infoLog("worlds don't match, recorded world taken");
+                                ExpensiveStones.infoLog("worlds don`t match, recorded world taken");
                             
                             World thisWorld = stones.getServer().getWorld(recordedWorld);
                             
@@ -176,7 +189,7 @@ public class ESStorageManager {
                             Location sign = new Location(thisWorld, signx, signy, signz);
                             Location field = new Location(thisWorld, x, y, z);
                             if(PreciousStones.getInstance().getForceFieldManager().getField(field.getBlock()) == null){
-                                log.log(Level.SEVERE, "[ExpensiveStones] Database is invalid! Deletion Offered on ID: " + id);
+                                log.log(Level.SEVERE, " Database is invalid! Deletion Offered on ID: " + id);
                                 this.offerDeletionOnLoad(id);
                                 continue;
                             }
@@ -192,7 +205,7 @@ public class ESStorageManager {
                 }
             }
         }else{
-            ExpensiveStones.infoLog("Database Error, can't connect! (selection)");
+            ExpensiveStones.infoLog("Database Error, can`t connect! (selection)");
             return null;
         }
         return null;
@@ -205,18 +218,18 @@ public class ESStorageManager {
             for(ExpensiveField single: pendingAdditions){
                 Location chest = single.getChestLocation();
                 Location sign = single.getSignLocation();
-                db.insert("INSERT INTO 'exstone_fields' ( 'id', 'status', "
-                        + "'chestx', 'chesty', 'chestz', "
-                        + "'signx', 'signy', 'signz', "
+                db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
+                        + "`chestx`, `chesty`, `chestz`, "
+                        + "`signx`, `signy`, `signz`, "
                         + "world "
                     + "VALUES( " + single.getField().getId() + "," + single.getStatus() + ","
                         + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
-                        + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ",'"
-                        + Helper.escapeQuotes(single.getField().getWorld()) + "');");
+                        + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ",`"
+                        + Helper.escapeQuotes(single.getField().getWorld()) + "`);");
             }
             pendingAdditions.clear();
         }else{
-            ExpensiveStones.infoLog("Database Error, can't connect! (addition)");
+            ExpensiveStones.infoLog("Database Error, can`t connect! (addition)");
         }     
     }
     
@@ -225,12 +238,12 @@ public class ESStorageManager {
             return;
         if(db.checkConnection()){
             for(Long single: pendingDeletions){
-                db.delete("DELETE FROM 'exstone_fields' "
+                db.delete("DELETE FROM `exstone_fields` "
                         + "WHERE id = " + single);
             }
             pendingDeletions.clear();
         }else{
-            ExpensiveStones.infoLog("Database Error, can't connect! (deletion)");
+            ExpensiveStones.infoLog("Database Error, can`t connect! (deletion)");
         }
     }
     
@@ -239,13 +252,13 @@ public class ESStorageManager {
             return;
         if(db.checkConnection()){
             for(Entry single : pendingStatusMutations.entrySet()){
-                db.update("UPDATE 'exstone_fields' "
-                        + "SET 'status' = " + single.getValue()
-                        + "WHERE 'id' = " + single.getKey());
+                db.update("UPDATE `exstone_fields` "
+                        + "SET `status` = " + single.getValue()
+                        + "WHERE `id` = " + single.getKey());
             }
             pendingStatusMutations.clear();
         }else{
-            ExpensiveStones.infoLog("Database Error, can't connect! (deletion)");
+            ExpensiveStones.infoLog("Database Error, can`t connect! (deletion)");
         }
     }
     
@@ -257,20 +270,20 @@ public class ESStorageManager {
                 ExpensiveField field = (ExpensiveField) single.getValue();
                 Location chest = field.getChestLocation();
                 Location sign = field.getSignLocation();
-                db.update("UPDATE 'exstone_fields' "
-                        + "SET 'status' = " + field.getStatus() + ","
-                        + "'chestx' = " + chest.getBlockX() + ","
-                        + "'chesty' = " + chest.getBlockY() + ","
-                        + "'chestz' = " + chest.getBlockZ() + ","
-                        + "'signx' = " + sign.getBlockX() + ","
-                        + "'signy' = " + sign.getBlockY() + ","
-                        + "'signz' = " + sign.getBlockZ() + ","
-                        + "'world' = '" + field.getField().getLocation().getWorld() + "' "
-                        + "WHERE 'id' = " + single.getKey() + ";");
+                db.update("UPDATE `exstone_fields` "
+                        + "SET `status` = " + field.getStatus() + ","
+                        + "`chestx` = " + chest.getBlockX() + ","
+                        + "`chesty` = " + chest.getBlockY() + ","
+                        + "`chestz` = " + chest.getBlockZ() + ","
+                        + "`signx` = " + sign.getBlockX() + ","
+                        + "`signy` = " + sign.getBlockY() + ","
+                        + "`signz` = " + sign.getBlockZ() + ","
+                        + "`world` = `" + field.getField().getLocation().getWorld() + "` "
+                        + "WHERE `id` = " + single.getKey() + ";");
             }
             pendingUpdates.clear();
         }else{
-            ExpensiveStones.infoLog("Database Error, can't connect! (deletion)");
+            ExpensiveStones.infoLog("Database Error, can`t connect! (deletion)");
         }
     }
     
@@ -288,7 +301,7 @@ public class ESStorageManager {
             return;
         
         if(db.checkConnection()){
-            db.execute("DROP TABLE 'exstone_fields'");
+            db.execute("DROP TABLE `exstone_fields`");
         }
     }
 }
