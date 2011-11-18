@@ -70,10 +70,10 @@ public class Configurator {
     public void configureStones(){
         //Check and add if tables are present
         if(!storageManager.dbHasExpensive()){
-            logInfo("Adding ExpenisveStone Table");
+            ExpensiveStones.infoLog("Adding ExpenisveStone Table");
             storageManager.addExpensiveTableToDatabase();
         }else{
-            logInfo("ExpensiveStone Table pressent");
+            ExpensiveStones.infoLog("ExpensiveStone Table pressent");
         }
         //Get data from ExpensiveStones-table to match other tables
             // Get all ESFieldSettings defined in the PreciousStones config.yml
