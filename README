@@ -43,5 +43,6 @@ You can define the Period by either placing 's' or 't', representing 's'econds o
 **Dev notes*
 FieldTypes:
  -Active
- -Disabled (dormant for new fields)
+ -Disabled
+ -Dormant
  -Admin (ignored on startup)
