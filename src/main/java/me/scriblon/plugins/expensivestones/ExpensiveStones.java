@@ -31,6 +31,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ExpensiveStones extends JavaPlugin {
+    
     private static final String prefix =  "[ExpensiveStones] ";
     private static final Logger log = Logger.getLogger("Minecraft");
     // Mine

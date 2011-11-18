@@ -3,8 +3,26 @@ database: true
 description: Extension on PreciousStones. Adding upkeep cost in form of a configurable
   item.
 generator: http://dinnerbone.com/minecraft/tools/pluginator/
-main: me.scriblon.plugins.expensivestones.Expensivestones
+main: me.scriblon.plugins.expensivestones.ExpensiveStones
 name: ExpensiveStones
 startup: postworld
 version: '0.1'
-depend: PreciousStones
+depend: [PreciousStones]
+softdepend: [PreciousStones]
+commands:
+  ExpensiveStones:
+    description: The 
+    aliases: [es, ExStones]
+    usage: Syntax error. Please use as follows /<command> [admin|bypass] when using admin add and id or 'point'    
+permissions:
+  ExpensiveStones.*:
+    description: for the lazy-basterd who wants to get everything done in one go ;).
+    children:
+      ExpensiveStones.admin: true
+      ExpensiveStones.bypass: true
+  ExpensiveStones.admin:
+    description: Player can place Admin-Fields.
+    default: false
+  ExpensiveStones.bypass:
+    description: Player can toggle to a bypass state, letting all placed stones be handled by PreciousStones
+    defualt: false

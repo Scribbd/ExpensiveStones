@@ -15,6 +15,7 @@
  */
 package me.scriblon.plugins.expensivestones.utils;
 
+import java.io.File;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
 import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;
@@ -34,7 +35,7 @@ public class DBFactory {
         if(pSettings.isUseMysql()){
             return new MySQLCore(pSettings.getHost(), pSettings.getPort(), pSettings.getDatabase(), pSettings.getUsername(), pSettings.getPassword());
         }else{
-            return new SQLiteCore("PreciousStones", stones.getDataFolder().getPath());
+            return new SQLiteCore("PreciousStones", stones.getDataFolder().getAbsolutePath());
         }
     }
 }

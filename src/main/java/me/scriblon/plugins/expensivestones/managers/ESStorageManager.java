@@ -70,8 +70,8 @@ public class ESStorageManager {
     public void addExpensiveTableToDatabase(){
         if(stones.getSettingsManager().isUseMysql()){
             if(db.checkConnection()){
-                db.execute("CREATE TABLE IF NOT EXISTS 'exstone_fields' "
-                    + "('id' bigint(20) NOT NULL, "
+                db.execute("CREATE TABLE IF NOT EXISTS 'exstone_fields' ("
+                    + "'id' bigint(20) NOT NULL, "
                     + "'status' tinyint NULL default 0, "
                     + "'chestx' int(11) default NULL, 'chesty' int(11) default NULL, 'chestz' int(11) default NULL, "
                     + "'signx' int(11) default NULL, 'signy' int(11) default NULL, signz' int(11) default NULL, "
