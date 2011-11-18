@@ -20,7 +20,6 @@ import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
-import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -57,35 +56,41 @@ public class ESBlockListener extends BlockListener{
         
         if(!event.getLine(0).equalsIgnoreCase("[ExpField]"))
             return;
-        
-        Player player = event.getPlayer();
-        // admin________________________________________________________________
-        if(event.getLine(1).equalsIgnoreCase("admin")){
-           //If player has admin-right
+        //Get basics
+        final Block block = event.getBlock();
+        final Player player = event.getPlayer();
+        //Get a certein block.
+        final Block fieldBlock = BlockUtil.getFieldStone(block, false);
+        //Chech if any surrounding blocks is a known fieldblock.
+        if(fieldBlock == null){
+            player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: No Expensive StoneType Found.");
+            return;
+        }
+    //_____________________Test Adming_____________________________
+        if(event.getLine(2).equalsIgnoreCase("admin")){
+            //Check rights
             if(!player.hasPermission("ExpensiveStones.admin")){
-              //Check if block there is a new expensiveField
-                final Block block = BlockUtil.getNewFieldStone(event.getBlock());
-                if(block == null || manager.isExpensiveType(block.getTypeId())){
-                    player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: No (Expensive) Field-Block Found");
-                    return;
-                }
-                //Check if field is known as ExpensiveField
-                if(!manager.isKnown(block)){
-                    player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is not know as ExpensiveField.");
-                    return;
-                }
-                
-                ExpensiveField field = manager.getExpensiveField(block);
-                manager.setAdminField(field);
+                player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: You don't have the permissions to make an adminField.");
             }else{
-                player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: You don't have permission to create an admin-field");
-                event.setCancelled(true);
-                return;
+                manager.setAdminField(manager.getExpensiveField(block));                
+                player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Admin-Field created, field is now handled by PreciousStones.");
+                player.sendMessage(ChatColor.YELLOW + "You can now destroy this sign.");
             }
-        //Normal_______________________________________________________________________
-        }else{
-            //TODO register as ExpensiveField
-        }        
+            return;
+        }
+        
+    //_____________________Normal Player___________________________
+        final Block chestBlock = BlockUtil.getChest(block);
+        //Chech chest
+        if(chestBlock == null){
+            player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: No chest found for register");
+            return;
+        }
+        final ExpensiveField expField = new ExpensiveField(block, chestBlock, stones.getForceFieldManager().getField(fieldBlock));
+        manager.disableField(expField);
+        event.setLine(1, expField.getField().getOwner());
+        event.setLine(2, expField.getField().getName());
+        player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field Registered, click to enable field");
     }
 
     @Override
@@ -96,7 +101,14 @@ public class ESBlockListener extends BlockListener{
         final Block block = event.getBlock();
         // SignCheck
         if(block.getType() == Material.SIGN){
-            //TODO handle dormanting of field
+            final Player player = event.getPlayer();
+            final Block fieldBlock = BlockUtil.getFieldStone(block, false);
+            //Check if fieldBlock has a known field
+            if(fieldBlock != null)
+                return;
+            //Get ExpensiveField and dormant it.
+            manager.setDormantField(manager.getExpensiveField(block));
+            player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is succesfully dormanted.");
             return;
         }
         // Check if block is known to ExpensiveField
@@ -117,8 +129,11 @@ public class ESBlockListener extends BlockListener{
         final Player player = event.getPlayer();
         final Block block = event.getBlock();
         
-        //Check if block in and PSField and expField
-        if(!stones.getForceFieldManager().isField(block) && !manager.isExpensiveType(block.getTypeId())) 
+        //Check if block in an ExpensiveType
+        if(!manager.isExpensiveType(block.getTypeId())) 
+            return;
+        //Check if block is known to PreciousStone (did stone get registered there)
+        if(!stones.getForceFieldManager().isField(block))
             return;
         
         //Do nothing when player has bypass permissions
@@ -128,11 +143,10 @@ public class ESBlockListener extends BlockListener{
         }
         
         //Add Field, will auto-dormant in creation of ExpensiveField
-        if(stones.getForceFieldManager().isField(block)){
-            ExpensiveField expField = new ExpensiveField(stones.getForceFieldManager().getField(block));
-            manager.addField(expField, true);
-            player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: stone detected! Stone is disabled.");
-        }
+        ExpensiveField expField = new ExpensiveField(stones.getForceFieldManager().getField(block));
+        manager.addField(expField, true);
+        player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: stone detected! Stone is disabled.");
+        player.sendMessage(ChatColor.YELLOW + "Place chest and sign to activate the field.");
     }
 
     @Override

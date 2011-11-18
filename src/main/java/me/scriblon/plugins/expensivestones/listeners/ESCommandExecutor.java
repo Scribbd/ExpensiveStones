@@ -15,7 +15,7 @@
  */
 package me.scriblon.plugins.expensivestones.listeners;
 
-import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,15 +27,25 @@ import org.bukkit.entity.Player;
  */
 public class ESCommandExecutor implements CommandExecutor{
     
-    private PreciousStones stones;
+    private ExpensiveStones stones;
     
     public ESCommandExecutor(){
-        stones = PreciousStones.getInstance();
+        stones = ExpensiveStones.getInstance();
     }
     
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)){
-            //TODO Uninstall plugin.
+            if(!command.getName().equalsIgnoreCase("ExpensiveStones")){
+                if(!label.equals("uninstall")){
+                    if(!args[0].equals("-a")){
+                        stones.getESStorageManager().deïnstallPart(sender);
+                        ExpensiveStones.infoLog("SQL error expected, ignore it.");
+                        ExpensiveStones.infoLog("Please delete ExpensiveStones.jar to complete the progress before next restart.");
+                        stones.getServer().getPluginManager().disablePlugin(stones);
+                        
+                    }       
+                }
+            }
         }
                    
         Player player = (Player) sender;

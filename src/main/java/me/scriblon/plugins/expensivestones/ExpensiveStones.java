@@ -24,6 +24,7 @@ import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
 import me.scriblon.plugins.expensivestones.listeners.ESPlayerListener;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
+import me.scriblon.plugins.expensivestones.tasks.UpDater;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
@@ -58,7 +59,7 @@ public class ExpensiveStones extends JavaPlugin {
         // Control dependencies
         Configurator config = new Configurator(pm);
         if(!config.isPSAvailable()){
-            infoLog("PreciousStones not available, disabling plugin!");
+            infoLog("PreciousStones not available or disabled, disabling plugin!");
             pm.disablePlugin(this);
             return;
         }
@@ -71,6 +72,8 @@ public class ExpensiveStones extends JavaPlugin {
         //Register
         this.registerEvents(pm);
         this.registerCommands();
+        // Register Saving thing
+        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new UpDater(eSStorageManager), 300L, 300L);
         // Conclude
         infoLog("Load was succesfull!");
     }
@@ -79,7 +82,7 @@ public class ExpensiveStones extends JavaPlugin {
         pm.registerEvent(Type.BLOCK_PLACE, esBlockListener, Priority.Highest, this);
         pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Highest, this);
         pm.registerEvent(Type.SIGN_CHANGE, esBlockListener, Priority.Normal, this);
-        pm.registerEvent(Type.REDSTONE_CHANGE, esBlockListener, Priority.Low, this);
+        //pm.registerEvent(Type.REDSTONE_CHANGE, esBlockListener, Priority.Low, this);
         pm.registerEvent(Type.PLAYER_INTERACT, esPlayerListener, Priority.Normal, this);
     }
     

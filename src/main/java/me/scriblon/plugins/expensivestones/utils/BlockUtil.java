@@ -15,6 +15,7 @@
  */
 package me.scriblon.plugins.expensivestones.utils;
 
+import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.Material;
@@ -63,7 +64,7 @@ public class BlockUtil {
      * @param sign
      * @return gets block
      */
-    public static Block getNewFieldStone(Block sign){
+    public static Block getFieldStone(Block sign, boolean mustBeNew){
         Block block;
         for(int x = -1; x<2; x++){
             for(int y = -1; y<2; y++){
@@ -71,8 +72,16 @@ public class BlockUtil {
                     if(x==0 && y==0 && z==0)
                         continue;
                     block = sign.getRelative(x, y, z);
-                    if(isField(block) && !isKnownField(block)){
-                        return block;
+                    if(isField(block) && mustBeNew){
+                        if(!isKnownField(block))
+                            return block;
+                    } else {
+                        if(isKnownField(block)){
+                            ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                            if(field.getSignLocation().equals(block.getLocation())){
+                                return block;
+                            }
+                        }
                     }
                 }
             }
@@ -80,21 +89,46 @@ public class BlockUtil {
         //Not the most effective way, but is a way.
         //Get 2 block away from sign.
         for(int x = -2; x < 3; x = x + 4){
-            block = sign.getRelative(0,0,x);
-            if(isField(block) && !isKnownField(block)){
-                return block;
+            block = sign.getRelative(0, 0, x);
+            if(isField(block) && mustBeNew){
+                if(!isKnownField(block))
+                    return block;
+            } else {
+                if(isKnownField(block)){
+                    ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                    if(field.getSignLocation().equals(block.getLocation())){
+                        return block;
+                    }
+                }
             }
-            block = sign.getRelative(0,x,0);
-            if(isField(block) && !isKnownField(block)){
-                return block;
+            block = sign.getRelative(0, x, 0);
+            if(isField(block) && mustBeNew){
+                if(!isKnownField(block))
+                    return block;
+            } else {
+                if(isKnownField(block)){
+                    ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                    if(field.getSignLocation().equals(block.getLocation())){
+                        return block;
+                    }
+                }
             }
-            block = sign.getRelative(x,0,0);
-            if(isField(block) && !isKnownField(block)){
-                return block;
+            block = sign.getRelative(x, 0, 0);
+            if(isField(block) && mustBeNew){
+                if(!isKnownField(block))
+                    return block;
+            } else {
+                if(isKnownField(block)){
+                    ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                    if(field.getSignLocation().equals(block.getLocation())){
+                        return block;
+                    }
+                }
             }
         }
+        //If everything fails!
         return null;
-    }
+    }   
     
     public static boolean isField(Block block){
         return PreciousStones.getInstance().getSettingsManager().isFieldType(block.getType());

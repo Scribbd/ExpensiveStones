@@ -35,6 +35,8 @@ import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.storage.DBCore;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * Hooks up with the PreciousStone storage mechanism and makes transfers possible.
@@ -278,6 +280,15 @@ public class ESStorageManager {
             this.deleteExpensiveField();
             this.updateStatus();
             this.updateField();
+        }
+    }
+    
+    public void deïnstallPart(CommandSender sender){
+        if(!(sender instanceof Player))
+            return;
+        
+        if(db.checkConnection()){
+            db.execute("DROP TABLE 'exstone_fields'");
         }
     }
 }

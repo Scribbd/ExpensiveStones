@@ -32,6 +32,7 @@ import net.sacredlabyrinth.Phaed.PreciousStones.managers.ForceFieldManager;
 import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 /**
@@ -115,7 +116,11 @@ public class Configurator {
     }
     
     public boolean isPSAvailable(){
-        return pm.getPlugin("PreciousStones") == null;
+        final Plugin testPlugin = pm.getPlugin("PreciousStones");
+        if(testPlugin != null)
+            return testPlugin.isEnabled();
+        return false;
+            
     }
     
     public PreciousStones getPS(){

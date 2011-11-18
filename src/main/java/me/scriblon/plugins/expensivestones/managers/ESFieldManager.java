@@ -68,14 +68,15 @@ public class ESFieldManager {
     //Adders
     public void addField(ExpensiveField field, boolean newField){
         if(field.isDisabled()){
-            disabledFields.put(field.getField().getId(), field);
+            disableField(field);
         } else if(field.isDormant()) {
-            dormantFields.put(field.getField().getLocation(), field);
+            setDormantField(field);
+        } else if(field.isAdmin()) {
+            setAdminField(field);
         } else {
-            activeFields.put(field.getField().getId(), field);
+            enableField(field);
         }
         if(newField){
-            //TODO dormant fields project
             storage.offerAddition(field);
         }
     }
@@ -123,6 +124,7 @@ public class ESFieldManager {
             
             field.setStatus(ESStorageManager.ES_DISABLED);
             field.setFieldOFF();
+            field.setSignToOff();
             storage.offerStatusUpdate(field);
         }       
     }
@@ -149,6 +151,7 @@ public class ESFieldManager {
 
             field.setStatus(ESStorageManager.ES_ENABLED);
             field.setFieldON();
+            field.setSignToOn();
             storage.offerStatusUpdate(field);
         } 
     }
@@ -175,6 +178,7 @@ public class ESFieldManager {
             
             field.setStatus(ESStorageManager.ES_ADMIN);
             field.setFieldON();
+            field.setSignToOP();
             storage.offerStatusUpdate(field);
         }
     }
