@@ -30,6 +30,7 @@ public class UpDater implements Runnable{
     }
             
     public void run() {
+        System.out.println("Now dating up!");
             storage.saveAll();
     }
     

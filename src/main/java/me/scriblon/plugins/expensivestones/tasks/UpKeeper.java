@@ -40,6 +40,7 @@ public class UpKeeper implements Runnable{
     }
     
     public void run() {
+        System.out.println("Now keep up!");
         // Check if field should be disabled
         if(field.getStatus() == ESStorageManager.ES_DISABLED){
             field.setSignToOff();

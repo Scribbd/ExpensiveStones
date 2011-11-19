@@ -98,6 +98,9 @@ public class ESBlockListener extends BlockListener{
         if(event.isCancelled())
             return;
         
+        if(!stones.getSettingsManager().isFieldType(event.getBlock()))
+            return;
+        
         final Block block = event.getBlock();
         // SignCheck
         if(block.getType() == Material.SIGN){

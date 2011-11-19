@@ -231,7 +231,12 @@ public class ESFieldManager {
     }
     
     public boolean isKnown(Block block){
-        return isKnownNonDormant(getExpensiveField(block).getField().getId()) || isInDormant(block.getLocation());
+        if(isInDormant(block.getLocation()))
+            return true;
+        if(getExpensiveField(block) != null)
+            if(isKnownNonDormant(getExpensiveField(block).getField().getId()))
+                return true;
+        return false;
     }
     
     public boolean isExpensiveType(int type){
@@ -313,8 +318,9 @@ public class ESFieldManager {
     public ExpensiveField getExpensiveField(Block block){
         if(isInDormant(block.getLocation()))
             return getDormantField(block);
-        else if(isKnownNonDormant(stones.getForceFieldManager().getField(block).getId()))
-            return getNonDormantField(block);
+        else if(stones.getForceFieldManager().isField(block))
+            if(isKnownNonDormant(stones.getForceFieldManager().getField(block).getId()))
+                return getNonDormantField(block);
         return null;
     }
     
