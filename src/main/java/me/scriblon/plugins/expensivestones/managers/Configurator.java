@@ -96,14 +96,16 @@ public class Configurator {
     }
     
     public Map<Integer, ESFieldSettings> getFieldSettings(){
+        System.out.println("ExpensiveField starts detecting configured fields.");
         Map<Integer, ESFieldSettings> settings = new LinkedHashMap<Integer, ESFieldSettings>();
         List<LinkedHashMap<String, Object>> forceFieldStones = vanillaSettings.getForceFieldBlocks();
         for(LinkedHashMap<String, Object> stone : forceFieldStones){
-            if(stone.containsKey("block") && stone.containsKey("ExpensiveField")){
+            if(stone.containsKey("block") && stone.containsKey("ExpensiveStone")){
+                System.out.println("ExpensiveField detected " + stone.get("title") + ": "+ stone.get("ExpensiveStone"));
                 if(!Helper.isInteger(stone.get("block")))
                         continue;
                 int type = (Integer) stone.get("block");
-                if(vanillaSettings.isFieldType(type) &&  Helper.convertBoolean(stone.get("ExpensiveField"))){
+                if(vanillaSettings.isFieldType(type) &&  Helper.convertBoolean(stone.get("ExpensiveStone"))){
                     FieldSettings vanillaFieldSettings = vanillaSettings.getFieldSettings(type);
                     //Get material
                     Material material = this.extractMaterial(stone); 
