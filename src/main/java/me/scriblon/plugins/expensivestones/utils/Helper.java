@@ -51,6 +51,13 @@ public class Helper {
         {
             return "";
         }
-        return str.replace("'", "''");
+        str = str.replace("'", "''");
+        return str;
+    }
+    
+    public static String dropUnderscore(String str){
+        if(str == null)
+            return "";
+        return str.replaceAll("_", "");
     }
 }

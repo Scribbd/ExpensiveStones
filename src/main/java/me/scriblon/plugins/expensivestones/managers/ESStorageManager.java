@@ -163,7 +163,7 @@ public class ESStorageManager {
                         + "exstone_fields.world as world, "
                         + "x, y, z "
                         + "FROM exstone_fields "
-                        + "WHERE world = `" + Helper.escapeQuotes(world) + "`;");
+                        + "WHERE world = '" + Helper.escapeQuotes(world) + "';");
                 System.out.println(world);
                 ExpensiveStones.infoLog("Done using MySQL to get table.");
             }else{
@@ -174,7 +174,7 @@ public class ESStorageManager {
                         + "pstone_fields.world as world, "
                         + "x, y, z "
                         + "FROM exstone_fields INNER JOIN pstone_fields ON pstone_fields.id = exstone_fields.id "
-                        + "WHERE world = `" + Helper.escapeQuotes(world) + "`;");
+                        + "WHERE world = '" + Helper.escapeQuotes(world) + "';");
 
             }
             if(res != null){
