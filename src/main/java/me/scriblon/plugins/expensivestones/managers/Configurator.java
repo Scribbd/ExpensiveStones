@@ -81,6 +81,9 @@ public class Configurator {
         fieldManager.setSettings(settings);
             // Get known ExpensiveFields
         List<ExpensiveField> expensiveFields = this.getExpensiveFields();
+        if(expensiveFields == null)
+            expensiveFields = Collections.EMPTY_LIST;
+        
         fieldManager.addFields(expensiveFields, false);
             // Schedule active Field Tasks
         for(Entry field : fieldManager.getActiveFields().entrySet()){
@@ -170,7 +173,9 @@ public class Configurator {
     private List<ExpensiveField> getExpensiveFields(){
         List<ExpensiveField> output = new ArrayList<ExpensiveField>();
         for(World world : plugin.getServer().getWorlds()){
-            output.addAll(storageManager.getExpensiveFields(world.getName()));
+            List<ExpensiveField> inGet = storageManager.getExpensiveFields(world.getName());
+            if(inGet != null && !inGet.isEmpty())
+                output.addAll(inGet);
         }
         return output;
     }

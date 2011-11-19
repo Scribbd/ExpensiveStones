@@ -343,5 +343,8 @@ public class ESFieldManager {
         return false;
     }
     
+    public boolean isNonePresent(){
+        return activeFields.isEmpty() && disabledFields.isEmpty() && dormantFields.isEmpty();
+    }
     
 }

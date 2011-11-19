@@ -66,6 +66,7 @@ public class ExpensiveStones extends JavaPlugin {
         }
         //Do the configuration
         config.configureStones();
+        
         // Initialize listeners and executors
         esBlockListener = new ESBlockListener();
         esPlayerListener = new ESPlayerListener();
