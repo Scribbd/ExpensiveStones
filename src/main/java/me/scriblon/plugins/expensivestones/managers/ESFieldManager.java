@@ -247,12 +247,14 @@ public class ESFieldManager {
     public boolean isKnown(Block block){
         if(isInDormant(block.getLocation()))
             return true;
-        if(getExpensiveField(block) != null){
-            final long id = getExpensiveField(block).getField().getId();
+        if(stones.getForceFieldManager().isField(block)){
+            final long id = stones.getForceFieldManager().getField(block).getId();
             //TODO debug
             System.out.println("IsKnown: debug long: " + id);
-            if(isKnownNonDormant(id))
+            if(isKnownNonDormant(id)){
+                System.out.println("IsKnown: Got A field!");
                 return true;
+            }
         }
         return false;
     }
@@ -321,8 +323,10 @@ public class ESFieldManager {
     }
     
     public ExpensiveField getNonDormantField(Block block){
-        if(stones.getForceFieldManager().getField(block) != null)
+        if(stones.getForceFieldManager().getField(block) == null)
             return null;
+        //TODO debugCode
+        System.out.println("GetNonDormant(block) got a valid request!");
         long iD = stones.getForceFieldManager().getField(block).getId();
         if(isKnownNonDormant(iD)){
             if(!isInDisabled(iD))
@@ -336,9 +340,13 @@ public class ESFieldManager {
     public ExpensiveField getExpensiveField(Block block){
         if(isInDormant(block.getLocation()))
             return getDormantField(block);
-        else if(stones.getForceFieldManager().isField(block))
-            if(isKnownNonDormant(stones.getForceFieldManager().getField(block).getId()))
+        else if(stones.getForceFieldManager().isField(block)){
+            if(isKnownNonDormant(stones.getForceFieldManager().getField(block).getId())){
                 return getNonDormantField(block);
+            }
+        }
+        //TODO debugcode
+        System.out.println("GetExpField(Block): No block selected!");
         return null;
     }
     

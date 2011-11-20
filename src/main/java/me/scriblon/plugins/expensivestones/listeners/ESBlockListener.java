@@ -56,6 +56,7 @@ public class ESBlockListener extends BlockListener{
         
         if(!event.getLine(0).equalsIgnoreCase("[ExpStone]"))
             return;
+        
         //Get basics
         final Block block = event.getBlock();
         final Player player = event.getPlayer();
@@ -89,7 +90,8 @@ public class ESBlockListener extends BlockListener{
         final ExpensiveField expField = new ExpensiveField(block, chestBlock, stones.getForceFieldManager().getField(fieldBlock));
         manager.disableField(expField);
         event.setLine(1, expField.getField().getOwner());
-        event.setLine(2, expField.getField().getType());
+        event.setLine(2, expField.getSettings().getMaterial().toString());
+        event.setLine(3, "<DISABLED>");
         player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field Registered, click to enable field");
     }
 

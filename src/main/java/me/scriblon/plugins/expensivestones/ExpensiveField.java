@@ -148,38 +148,22 @@ public class ExpensiveField {
     
     public void setSignToOP(){
         sign.setLine(3, "<ADMIN>");
-        if(!sign.update()){
-            //TODO debugcode
-            System.out.println("Forced to update.");
-            sign.update(true);
-        }
+        sign.update(true);
     }
     
     public void setSignToOff(){
         sign.setLine(3, "<DISABLED>");
-        if(!sign.update()){
-            //TODO debugcode
-            System.out.println("Forced to update.");
-            sign.update(true);
-        }
+        sign.update(true);
     }
     
     public void setSignToOn(){
         sign.setLine(3, "<ENABLED>");
-        if(!sign.update()){
-            //TODO debugcode
-            System.out.println("Forced to update.");
-            sign.update(true);
-        }
+        sign.update(true);       
     }
     
     public void setSignToDepleted(){
         sign.setLine(3, "<DEPLETED>");
-        if(!sign.update()){
-            //TODO debugcode
-            System.out.println("Forced to update.");
-            sign.update(true);
-        }
+        sign.update(true);
     }
     
     public boolean setError(){

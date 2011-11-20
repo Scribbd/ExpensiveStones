@@ -72,21 +72,23 @@ public class BlockUtil {
                     if(x==0 && y==0 && z==0)
                         continue;
                     block = sign.getRelative(x, y, z);
-                    if(isField(block) && mustBeNew){
-                        if(!isKnownField(block))
-                            return block;
-                    } else {
-                        if(isKnownField(block)){
-                            //TODO debug
-                            System.out.println("BlockUtil: found it!");
-                            final ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
-                            //TODO debugCode
-                            if(field == null)
-                                System.out.println("BlockUtil: field is null... while it shouldn't.");
-                            if(block == null)
-                                System.out.println("BlockUtil: stone is null... while it shouldn't.");
-                            if(field.getField().getLocation().equals(block.getLocation())){
+                    if(isField(block)){
+                        if(mustBeNew){
+                            if(isField(block))
                                 return block;
+                        } else {
+                            if(isKnownField(block)){
+                                //TODO debug
+                                System.out.println("BlockUtil: found it!");
+                                final ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                                //TODO debugCode
+                                if(field == null)
+                                    System.out.println("BlockUtil: field is null... while it shouldn't.");
+                                if(block == null)
+                                    System.out.println("BlockUtil: stone is null... while it shouldn't.");
+                                if(field.getField().getLocation().equals(block.getLocation())){
+                                    return block;
+                                }
                             }
                         }
                     }
@@ -97,38 +99,65 @@ public class BlockUtil {
         //Get 2 block away from sign.
         for(int x = -2; x < 3; x = x + 4){
             block = sign.getRelative(0, 0, x);
-            if(isField(block) && mustBeNew){
-                if(!isKnownField(block))
-                    return block;
-            } else {
-                if(isKnownField(block)){
-                    ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
-                    if(field.getSignLocation().equals(block.getLocation())){
+            if(isField(block)){
+                if(mustBeNew){
+                    if(isField(block))
                         return block;
+                } else {
+                    if(isKnownField(block)){
+                        //TODO debug
+                        System.out.println("BlockUtil: found it!");
+                        final ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                        //TODO debugCode
+                        if(field == null)
+                            System.out.println("BlockUtil: field is null... while it shouldn't.");
+                        if(block == null)
+                            System.out.println("BlockUtil: stone is null... while it shouldn't.");
+                        if(field.getField().getLocation().equals(block.getLocation())){
+                            return block;
+                        }
                     }
                 }
             }
             block = sign.getRelative(0, x, 0);
-            if(isField(block) && mustBeNew){
-                if(!isKnownField(block))
-                    return block;
-            } else {
-                if(isKnownField(block)){
-                    ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
-                    if(field.getSignLocation().equals(block.getLocation())){
+            if(isField(block)){
+                if(mustBeNew){
+                    if(isField(block))
                         return block;
+                } else {
+                    if(isKnownField(block)){
+                        //TODO debug
+                        System.out.println("BlockUtil: found it!");
+                        final ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                        //TODO debugCode
+                        if(field == null)
+                            System.out.println("BlockUtil: field is null... while it shouldn't.");
+                        if(block == null)
+                            System.out.println("BlockUtil: stone is null... while it shouldn't.");
+                        if(field.getField().getLocation().equals(block.getLocation())){
+                            return block;
+                        }
                     }
                 }
             }
             block = sign.getRelative(x, 0, 0);
-            if(isField(block) && mustBeNew){
-                if(!isKnownField(block))
-                    return block;
-            } else {
-                if(isKnownField(block)){
-                    ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
-                    if(field.getSignLocation().equals(block.getLocation())){
+            if(isField(block)){
+                if(mustBeNew){
+                    if(isField(block))
                         return block;
+                } else {
+                    if(isKnownField(block)){
+                        //TODO debug
+                        System.out.println("BlockUtil: found it!");
+                        final ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
+                        //TODO debugCode
+                        if(field == null)
+                            System.out.println("BlockUtil: field is null... while it shouldn't.");
+                        if(block == null)
+                            System.out.println("BlockUtil: stone is null... while it shouldn't.");
+                        if(field.getField().getLocation().equals(block.getLocation())){
+                            return block;
+                        }
                     }
                 }
             }
