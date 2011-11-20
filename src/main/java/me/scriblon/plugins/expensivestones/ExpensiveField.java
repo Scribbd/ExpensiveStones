@@ -50,13 +50,13 @@ public class ExpensiveField {
      * @param field
      * @throws UnknownTypeException 
      */
-    public ExpensiveField(Block sign, Block chest, Field field) throws UnknownTypeException{
+    public ExpensiveField(Block sign, Block chest, Field field){
         if(isCorrectValues(sign, chest)){
             this.status = ESStorageManager.ES_ENABLED;
             
-            this.sign = (Sign) sign;
+            this.sign = (Sign) sign.getState();
             this.signLocation = sign.getLocation();
-            this.chest = (Chest) chest;
+            this.chest = (Chest) chest.getState();
             this.chestLocation = chest.getLocation();
             this.field = field;
             this.settings = ExpensiveStones.getInstance().getESFieldManager().getESFieldSetting(field.getTypeId());
@@ -68,8 +68,8 @@ public class ExpensiveField {
         if(status != ESStorageManager.ES_DORMANT){
             this.signLocation = signLocation;
             this.chestLocation = chestLocation;
-            this.sign = (Sign) signLocation.getBlock();
-            this.chest = (Chest) chestLocation.getBlock();
+            this.sign = (Sign) signLocation.getBlock().getState();
+            this.chest = (Chest) chestLocation.getBlock().getState();
         } else{
             this.signLocation = null;
             this.chestLocation = null;
@@ -146,24 +146,40 @@ public class ExpensiveField {
         this.sign = (Sign) sign;
     }
     
-    public boolean setSignToOP(){
+    public void setSignToOP(){
         sign.setLine(3, "<ADMIN>");
-        return sign.update();
+        if(!sign.update()){
+            //TODO debugcode
+            System.out.println("Forced to update.");
+            sign.update(true);
+        }
     }
     
-    public boolean setSignToOff(){
+    public void setSignToOff(){
         sign.setLine(3, "<DISABLED>");
-        return sign.update();
+        if(!sign.update()){
+            //TODO debugcode
+            System.out.println("Forced to update.");
+            sign.update(true);
+        }
     }
     
-    public boolean setSignToOn(){
+    public void setSignToOn(){
         sign.setLine(3, "<ENABLED>");
-        return sign.update();
+        if(!sign.update()){
+            //TODO debugcode
+            System.out.println("Forced to update.");
+            sign.update(true);
+        }
     }
     
-    public boolean setSignToDepleted(){
+    public void setSignToDepleted(){
         sign.setLine(3, "<DEPLETED>");
-        return sign.update();
+        if(!sign.update()){
+            //TODO debugcode
+            System.out.println("Forced to update.");
+            sign.update(true);
+        }
     }
     
     public boolean setError(){
@@ -200,25 +216,31 @@ public class ExpensiveField {
     
     //Field Toglles
     public void setFieldON(){
-        field.setDisabled(true);
+        field.setDisabled(false);
+        //TODO debugcode
+        if(field.isDisabled())
+            System.out.println("enabling succes");
+        else
+            System.out.println("enabling failed");
     }
     
     public void setFieldOFF(){
-        field.setDisabled(false);
+        field.setDisabled(true);
+        //TODO debugcode
+        if(!field.isDisabled())
+            System.out.println("disabling succes");
+        else
+            System.out.println("disabling failed");
     }
     
     public boolean isFieldDisabled(){
         return field.isDisabled();
     }
     //Pirvates
-    private boolean isCorrectValues(Block sign, Block chest) throws UnknownTypeException{
-        if(BlockUtil.isSign(sign)){
+    private boolean isCorrectValues(Block sign, Block chest){
+        if(BlockUtil.isSign(sign))
             if(BlockUtil.isChest(chest))
                 return true;
-            else
-                throw new UnknownTypeException(null, "Type is geen chest-type"); 
-        }
-        else
-            throw new UnknownTypeException(null, "Type is geen Sign-type");
+        return false;
     }
 }

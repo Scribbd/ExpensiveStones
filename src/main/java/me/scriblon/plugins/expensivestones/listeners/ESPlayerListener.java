@@ -47,6 +47,8 @@ public class ESPlayerListener extends PlayerListener{
             return;
 
         final Block block = event.getClickedBlock();
+        //TODO debugcode
+        System.out.println("ExpStone: interact event triggered.");
     //___Implementation on clicking sign
         if(block.getType() == Material.SIGN){
             final Block fieldBlock = BlockUtil.getFieldStone(block, true);

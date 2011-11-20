@@ -53,8 +53,8 @@ public class ExpensiveStones extends JavaPlugin {
         infoLog("Starting to load!");
         expStones = this;
         // initialize Managers
-        eSFieldManager = new ESFieldManager();
         eSStorageManager = new ESStorageManager();
+        eSFieldManager = new ESFieldManager();
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
         // Control dependencies

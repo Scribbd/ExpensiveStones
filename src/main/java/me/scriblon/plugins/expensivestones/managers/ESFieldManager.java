@@ -51,7 +51,6 @@ public class ESFieldManager {
     public ESFieldManager(){
         stones = PreciousStones.getInstance();
         storage = ExpensiveStones.getInstance().getESStorageManager();
-        
     }
     
     //Settings related
@@ -67,14 +66,26 @@ public class ESFieldManager {
     
     //Adders
     public void addField(ExpensiveField field, boolean newField){
+        final long id = field.getField().getId();
         if(field.isDisabled()){
-            disableField(field);
+            field.setStatus(ESStorageManager.ES_DISABLED);
+            field.setFieldOFF();
+            field.setSignToOff();
+            disabledFields.put(id, field);
         } else if(field.isDormant()) {
-            setDormantField(field);
+            field.setStatus(ESStorageManager.ES_DORMANT);
+            field.setFieldOFF();
+            dormantFields.put(field.getField().getLocation(), field);
         } else if(field.isAdmin()) {
-            setAdminField(field);
+            field.setStatus(ESStorageManager.ES_ADMIN);
+            field.setFieldON();
+            field.setSignToOP();
+            activeFields.put(id, field);
         } else {
-            enableField(field);
+            field.setStatus(ESStorageManager.ES_ENABLED);
+            field.setFieldON();
+            field.setSignToOn();
+            activeFields.put(id, field);
         }
         if(newField){
             storage.offerAddition(field);
@@ -97,6 +108,9 @@ public class ESFieldManager {
                 disabledFields.remove(id);
             if(dormantFields.containsKey(field.getField().getLocation()))
                 dormantFields.remove(field.getField().getLocation());
+            //TODO debugCode
+            if(activeFields.containsKey(id) || disabledFields.containsKey(id) || dormantFields.containsKey(field.getField().getLocation()))
+                System.out.println("Deletion Failed!");
             storage.offerDeletion(field);
         }
     }
@@ -200,7 +214,7 @@ public class ESFieldManager {
             }
             if(!dormantFields.containsKey(field.getField().getLocation())){
                 dormantFields.put(field.getField().getLocation(), field);
-                ExpensiveStones.infoLog("(Dormant)Field was disabled before Dromant. on ID: " + id);
+                ExpensiveStones.infoLog("(Dormant)Field is set Dormant. on ID: " + id);
             } else 
                 ExpensiveStones.infoLog("(Dormant)Field already dormant before Dromant. on ID: " + id);
             
@@ -233,9 +247,13 @@ public class ESFieldManager {
     public boolean isKnown(Block block){
         if(isInDormant(block.getLocation()))
             return true;
-        if(getExpensiveField(block) != null)
-            if(isKnownNonDormant(getExpensiveField(block).getField().getId()))
+        if(getExpensiveField(block) != null){
+            final long id = getExpensiveField(block).getField().getId();
+            //TODO debug
+            System.out.println("IsKnown: debug long: " + id);
+            if(isKnownNonDormant(id))
                 return true;
+        }
         return false;
     }
     

@@ -198,8 +198,9 @@ public class ESStorageManager {
                             int z = res.getInt("z");
                             String recordedWorld = res.getString("world");
                             
-                            if(world.equalsIgnoreCase(recordedWorld) && world != null)
-                                ExpensiveStones.infoLog("worlds don`t match, recorded world taken");
+                            if(!world.equalsIgnoreCase(recordedWorld)){
+                                ExpensiveStones.infoLog("worlds don`t match, recorded world taken \nrec: " + recordedWorld + " asked: " + world);
+                            }
                             
                             World thisWorld = stones.getServer().getWorld(recordedWorld);
                             
@@ -222,11 +223,13 @@ public class ESStorageManager {
                     Logger.getLogger(ESStorageManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            //TODO dbug
+            System.out.println("Loading found fields: " + fields.size());
+            return fields;
         }else{
             ExpensiveStones.infoLog("Database Error, can`t connect! (selection)");
             return null;
         }
-        return null;
     }
         
     public void insertExpensiveField() {
@@ -234,29 +237,47 @@ public class ESStorageManager {
             return;
         if(db.checkConnection()){
             for(ExpensiveField single: pendingAdditions){
-                Location chest = single.getChestLocation();
-                Location sign = single.getSignLocation();
-                if(stones.getSettingsManager().isUseMysql()){
-                    db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
-                            + "`chestx`, `chesty`, `chestz`, "
-                            + "`signx`, `signy`, `signz`, "
-                            + "world "
-                        + "VALUES( " + single.getField().getId() + "," + single.getStatus() + ","
-                            + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
-                            + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ",`"
-                            + Helper.escapeQuotes(single.getField().getWorld()) + "`);");
-                } else{
-                    final Location fieldLocation = single.getField().getLocation();
-                    db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
-                            + "`chestx`, `chesty`, `chestz`, "
-                            + "`signx`, `signy`, `signz`, "
-                            + "`x`, `y`, `z`, "
-                            + "world "
-                        + "VALUES( " + single.getField().getId() + "," + single.getStatus() + ","
-                            + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
-                            + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ","
-                            + fieldLocation.getBlockX() + "," + fieldLocation.getBlockY() + "," + fieldLocation.getBlockZ() + ","
-                            + "`" + Helper.escapeQuotes(single.getField().getWorld()) + "`);"); 
+                //TODO debugCode
+                System.out.println(" `world` tester = " + Helper.escapeQuotes(single.getField().getWorld()));
+                if(single.isDormant()){
+                    if(stones.getSettingsManager().isUseMysql()){
+                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, `world` ) "
+                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
+                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');");
+                    } else {
+                        final Location fieldLocation = single.getField().getLocation();
+                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
+                                + "`x`, `y`, `z`, "
+                                + "`world` ) "
+                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
+                                + fieldLocation.getBlockX() + "," + fieldLocation.getBlockY() + "," + fieldLocation.getBlockZ() + ","
+                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');"); 
+                    }
+                } else {
+                    Location chest = single.getChestLocation();
+                    Location sign = single.getSignLocation();
+                    if(stones.getSettingsManager().isUseMysql()){
+                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
+                                + "`chestx`, `chesty`, `chestz`, "
+                                + "`signx`, `signy`, `signz`, "
+                                + "`world` ) "
+                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
+                                + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
+                                + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ","
+                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');");
+                    } else {
+                        final Location fieldLocation = single.getField().getLocation();
+                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
+                                + "`chestx`, `chesty`, `chestz`, "
+                                + "`signx`, `signy`, `signz`, "
+                                + "`x`, `y`, `z`, "
+                                + "`world` ) "
+                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
+                                + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
+                                + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ","
+                                + fieldLocation.getBlockX() + "," + fieldLocation.getBlockY() + "," + fieldLocation.getBlockZ() + ","
+                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');"); 
+                    }
                 }
             }
             pendingAdditions.clear();
@@ -269,7 +290,7 @@ public class ESStorageManager {
         if(pendingDeletions.isEmpty())
             return;
         if(db.checkConnection()){
-            for(Long single: pendingDeletions){
+            for(Long single : pendingDeletions){
                 db.delete("DELETE FROM `exstone_fields` "
                         + "WHERE `id` = " + single);
             }
@@ -300,34 +321,64 @@ public class ESStorageManager {
         if(db.checkConnection()){
             for(Entry single : pendingUpdates.entrySet()){
                 ExpensiveField field = (ExpensiveField) single.getValue();
-                Location chest = field.getChestLocation();
-                Location sign = field.getSignLocation();
-                if(stones.getSettingsManager().isUseMysql()){
-                    final Location fieldLocation = field.getField().getLocation();
-                    db.update("UPDATE `exstone_fields` "
-                            + "SET `status` = " + field.getStatus() + ","
-                            + "`chestx` = " + chest.getBlockX() + ","
-                            + "`chesty` = " + chest.getBlockY() + ","
-                            + "`chestz` = " + chest.getBlockZ() + ","
-                            + "`signx` = " + sign.getBlockX() + ","
-                            + "`signy` = " + sign.getBlockY() + ","
-                            + "`signz` = " + sign.getBlockZ() + ","
-                            + "`x` = " + fieldLocation.getBlockX() + ","
-                            + "`y` = " + fieldLocation.getBlockY() + ","
-                            + "`z` = " + fieldLocation.getBlockZ() + ","
-                            + "`world` = `" + field.getField().getLocation().getWorld() + "` "
-                            + "WHERE `id` = " + single.getKey() + ";");
-                }else{
-                    db.update("UPDATE `exstone_fields` "
-                            + "SET `status` = " + field.getStatus() + ","
-                            + "`chestx` = " + chest.getBlockX() + ","
-                            + "`chesty` = " + chest.getBlockY() + ","
-                            + "`chestz` = " + chest.getBlockZ() + ","
-                            + "`signx` = " + sign.getBlockX() + ","
-                            + "`signy` = " + sign.getBlockY() + ","
-                            + "`signz` = " + sign.getBlockZ() + ","
-                            + "`world` = `" + field.getField().getLocation().getWorld() + "` "
-                            + "WHERE `id` = " + single.getKey() + ";");
+                if(field.getStatus() == ES_DORMANT){
+                    if(stones.getSettingsManager().isUseMysql()){
+                        final Location fieldLocation = field.getField().getLocation();
+                        db.update("UPDATE `exstone_fields` "
+                                + "SET `status` = NULL, "
+                                + "`chestx` = NULL, "
+                                + "`chesty` = NULL, "
+                                + "`chestz` = NULL, "
+                                + "`signx` = NULL, "
+                                + "`signy` = NULL, "
+                                + "`signz` = NULL, " 
+                                + "`x` = " + fieldLocation.getBlockX() + ", "
+                                + "`y` = " + fieldLocation.getBlockY() + ", "
+                                + "`z` = " + fieldLocation.getBlockZ() + ", "
+                                + "`world` = '" + field.getField().getWorld() + "' "
+                                + "WHERE `id` = " + single.getKey() + ";");
+                    }else{
+                        db.update("UPDATE `exstone_fields` "
+                                + "SET `status` = " + field.getStatus() + ","
+                                + "`chestx` = NULL, "
+                                + "`chesty` = NULL, "
+                                + "`chestz` = NULL, "
+                                + "`signx` = NULL, "
+                                + "`signy` = NULL, "
+                                + "`signz` = NULL, " 
+                                + "`world` = '" + field.getField().getWorld() + "' "
+                                + "WHERE `id` = " + single.getKey() + ";");
+                    }
+                } else {
+                    Location chest = field.getChestLocation();
+                    Location sign = field.getSignLocation();
+                    if(stones.getSettingsManager().isUseMysql()){
+                        final Location fieldLocation = field.getField().getLocation();
+                        db.update("UPDATE `exstone_fields` "
+                                + "SET `status` = " + field.getStatus() + ", "
+                                + "`chestx` = " + chest.getBlockX() + ", "
+                                + "`chesty` = " + chest.getBlockY() + ", "
+                                + "`chestz` = " + chest.getBlockZ() + ", "
+                                + "`signx` = " + sign.getBlockX() + ", "
+                                + "`signy` = " + sign.getBlockY() + ", "
+                                + "`signz` = " + sign.getBlockZ() + ", " 
+                                + "`x` = " + fieldLocation.getBlockX() + ", "
+                                + "`y` = " + fieldLocation.getBlockY() + ", "
+                                + "`z` = " + fieldLocation.getBlockZ() + ", "
+                                + "`world` = '" + field.getField().getWorld() + "' "
+                                + "WHERE `id` = " + single.getKey() + ";");
+                    }else{
+                        db.update("UPDATE `exstone_fields` "
+                                + "SET `status` = " + field.getStatus() + ", "
+                                + "`chestx` = " + chest.getBlockX() + ", "
+                                + "`chesty` = " + chest.getBlockY() + ", "
+                                + "`chestz` = " + chest.getBlockZ() + ", "
+                                + "`signx` = " + sign.getBlockX() + ", "
+                                + "`signy` = " + sign.getBlockY() + ", "
+                                + "`signz` = " + sign.getBlockZ() + ", "
+                                + "`world` = '" + field.getField().getWorld() + "' "
+                                + "WHERE `id` = " + single.getKey() + ";");
+                    }
                 }
             }
             pendingUpdates.clear();
@@ -338,8 +389,8 @@ public class ESStorageManager {
     
     public void saveAll(){
         synchronized(this){
-            this.insertExpensiveField();
             this.deleteExpensiveField();
+            this.insertExpensiveField();
             this.updateStatus();
             this.updateField();
         }

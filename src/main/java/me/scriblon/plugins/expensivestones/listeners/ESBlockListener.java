@@ -54,7 +54,7 @@ public class ESBlockListener extends BlockListener{
         if(event.isCancelled())
             return;
         
-        if(!event.getLine(0).equalsIgnoreCase("[ExpField]"))
+        if(!event.getLine(0).equalsIgnoreCase("[ExpStone]"))
             return;
         //Get basics
         final Block block = event.getBlock();
@@ -89,7 +89,7 @@ public class ESBlockListener extends BlockListener{
         final ExpensiveField expField = new ExpensiveField(block, chestBlock, stones.getForceFieldManager().getField(fieldBlock));
         manager.disableField(expField);
         event.setLine(1, expField.getField().getOwner());
-        event.setLine(2, expField.getField().getName());
+        event.setLine(2, expField.getField().getType());
         player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field Registered, click to enable field");
     }
 
@@ -98,19 +98,26 @@ public class ESBlockListener extends BlockListener{
         if(event.isCancelled())
             return;
         
-        if(!stones.getSettingsManager().isFieldType(event.getBlock()))
+        final Block block = event.getBlock();
+        
+        if(!stones.getSettingsManager().isFieldType(event.getBlock()) && !(block.getType().equals(Material.SIGN) || block.getType().equals(Material.WALL_SIGN)))
             return;
         
-        final Block block = event.getBlock();
         // SignCheck
-        if(block.getType() == Material.SIGN){
+        if(block.getType().equals(Material.SIGN) || block.getType().equals(Material.WALL_SIGN)){
+            //TODO debugcode
+            System.out.println("ExpStone: Signbreak event triggered");
             final Player player = event.getPlayer();
             final Block fieldBlock = BlockUtil.getFieldStone(block, false);
             //Check if fieldBlock has a known field
-            if(fieldBlock != null)
+            if(fieldBlock == null){
+                //TODO debugcode
+                System.out.println("ExpStone: Couldn't find asked stone.");
                 return;
+            }   
             //Get ExpensiveField and dormant it.
-            manager.setDormantField(manager.getExpensiveField(block));
+            final ExpensiveField field = manager.getExpensiveField(fieldBlock);
+            manager.setDormantField(field);
             player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is succesfully dormanted.");
             return;
         }
@@ -135,10 +142,12 @@ public class ESBlockListener extends BlockListener{
         //Check if block in an ExpensiveType
         if(!manager.isExpensiveType(block.getTypeId())) 
             return;
+        //TODO debugcode
+        System.out.println("Expst: stone is of type");
         //Check if block is known to PreciousStone (did stone get registered there)
         if(!stones.getForceFieldManager().isField(block))
             return;
-        
+        System.out.println("Expst: stone is a Field block.");
         //Do nothing when player has bypass permissions
         if(player.hasPermission("ExpensiveStones.bypass")){
             player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Bypassed! Field handled by PreciousStones.");
