@@ -1,5 +1,3 @@
-__STATUS: DEVELOPMENT! DO NOT COMPILE AND USE!
-
 ---This plugin requires ExpensiveStones v7.0.5 or higher!---
 
 Welcome to ExpensiveStones Readme, here will you find all info about ExpensiveStones relating to configuration and the workings.
@@ -22,7 +20,7 @@ You can define each 'ExpensiveStone' with a custom Material, UpkeepPeriod and th
 Configuring is simply done by adding the next options to the config.yml from PreciousStones:
   - ExpensiveStone: true/false
   - ExpensiveMaterial: <itemID> defaults redstone when not present
-  - ExpensivePeriod: <int> [S|T] defaults 15s when not present
+  - ExpensivePeriod: <int>[S|T] defaults 15s when not pressnt.
   - ExpensiveCost: <int> defaults 2 when not present
 You can define the Period by either placing 's' or 't', representing 's'econds or 't'icks. Remember that 20t is 1s servertime.
 
@@ -37,12 +35,13 @@ You can define the Period by either placing 's' or 't', representing 's'econds o
   /es admin point (toggles admin on the block being targeted)
   
   CONSOLE ONLY
-  expensiveStones uninstall -true (deletes EVERYTHING related to ExpensiveFields)
-  expensiveStones purge -true (drops the expensiveStone table)
+  expensiveStones uninstall -a (deletes EVERYTHING related to ExpensiveStones)
+  expensiveStones purge -a (purges the table, will make every ExpensiveStone a PreciousStone)
+  expensiveStones drop -a (drops the expensiveStone table)
 
 **Dev notes*
 FieldTypes:
- -Active
- -Disabled
- -Dormant
- -Admin (ignored on startup)
+  - Active
+  - Disabled
+  - Dormant
+  - Admin (ignored on startup)
