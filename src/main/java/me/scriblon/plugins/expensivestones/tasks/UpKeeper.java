@@ -17,8 +17,7 @@ package me.scriblon.plugins.expensivestones.tasks;
 
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
-import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
-import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -42,25 +41,33 @@ public class UpKeeper implements Runnable{
     public void run() {
         System.out.println("Now keep up!");
         // Check if field should be disabled
-        if(field.getStatus() == ESStorageManager.ES_DISABLED){
-            field.setSignToOff();
+        if(field.isDisabled()){
             // Check if field was in disabled list
             if(ExpensiveStones.getInstance().getESFieldManager().isInDisabled(field.getField().getId())){
-                ESFieldManager manager = ExpensiveStones.getInstance().getESFieldManager();
-                manager.disableField(field);
-                ExpensiveStones.infoLog("(UpKeeper) field was still on enabled list! On ID: " +
-                        manager.isInDisabled(field.getField().getId()));
+                ExpensiveStones.getInstance().getESFieldManager().disableField(field);
+                ExpensiveStones.infoLog("(UpKeeper) field was still on enabled list! On ID: " + field.getField().getId());
             }
             this.stopMe();
+            field.setSignToOff();
             return;
         }
+        // Check if chest is still there
+        if(!field.getChestLocation().getBlock().getType().equals(Material.CHEST)){
+            field.setError();
+            ExpensiveStones.getInstance().getESFieldManager().setDormantField(field);
+            return;
+        }
+        
         // Check chest for required content
         if(field.chestHasReqContent()){
             field.doUpkeeping();
         }else{
+            //Disable Field
+            ExpensiveStones.getInstance().getESFieldManager().disableField(field);
             //Change sign
             field.setSignToDepleted();
-            //Cancel task
+            //Cancel task 
+            System.out.println("(Upkeeper) Now canceling job for id: " + field.getField().getId());
             if(iD != -1)
                 this.stopMe();
             else
@@ -70,7 +77,7 @@ public class UpKeeper implements Runnable{
     }
     
     public long scheduleMe(){
-        iD = this.scheduler.scheduleSyncRepeatingTask(plugin, this, 0, field.getSettings().getUpkeepPeriod());
+        iD = this.scheduler.scheduleSyncRepeatingTask(plugin, this, 1L, field.getSettings().getUpkeepPeriod());
         return iD;
     }
     

@@ -66,7 +66,7 @@ public class BlockUtil {
      */
     public static Block getFieldStone(Block sign, boolean mustBeNew){
         Block block;
-        for(int x = 1; x>-22; x--){
+        for(int x = 1; x>-2; x--){
             for(int y = 1; y>-2; y--){
                 for(int z = 1; z>-2; z--){
                     if(x==0 && y==0 && z==0)

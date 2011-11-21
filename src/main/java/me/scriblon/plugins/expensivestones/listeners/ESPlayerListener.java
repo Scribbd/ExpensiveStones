@@ -45,7 +45,7 @@ public class ESPlayerListener extends PlayerListener{
     public void onPlayerInteract(PlayerInteractEvent event) {
         if(event.isCancelled())
             return;
-
+                                                                                                                                            
         final Block block = event.getClickedBlock();
         //TODO debugcode
         System.out.println("ExpStone: interact event triggered.");
@@ -59,16 +59,18 @@ public class ESPlayerListener extends PlayerListener{
                 System.out.println("SignInteract: FieldBlock == null");
                 return;
             }
+            //Check if field is dormant
+            if(manager.isInDormant(fieldBlock.getLocation()))
+                return;
+            
             //Get ExpensiveField and process request
-            if(!manager.isInDormant(block.getLocation())){
-                final ExpensiveField field = manager.getExpensiveField(block);
-                //TODO debug
-                if(field == null)
-                    System.out.println("SignInteract: Field is null!");
-                else
-                    System.out.println("SignInteract: Toggle field ID: " + field.getField().getId());
-                this.toggleField(field);
-            }
+            final ExpensiveField field = manager.getExpensiveField(fieldBlock);
+            //TODO debug
+            if(field == null)
+                System.out.println("SignInteract: Field is null!");
+            else
+                System.out.println("SignInteract: Toggle field ID: " + field.getField().getId());
+            this.toggleField(field);
             return;
         }
     //___Implementation on clicking on stone

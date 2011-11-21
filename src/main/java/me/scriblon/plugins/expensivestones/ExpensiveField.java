@@ -18,6 +18,7 @@ package me.scriblon.plugins.expensivestones;
 import javax.lang.model.type.UnknownTypeException;
 import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
+import me.scriblon.plugins.expensivestones.utils.ChestUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 import org.bukkit.Location;
@@ -151,6 +152,11 @@ public class ExpensiveField {
         sign.update(true);
     }
     
+    public void setSignToProgress(){
+        sign.setLine(3, "<DISABLING>");
+        sign.update(true);
+    }
+    
     public void setSignToOff(){
         sign.setLine(3, "<DISABLED>");
         sign.update(true);
@@ -166,19 +172,18 @@ public class ExpensiveField {
         sign.update(true);
     }
     
-    public boolean setError(){
-        sign.setLine(3, "<ERROR>");
-        return sign.update();
+    public void setError(){
+        sign.setLine(3, "<BROKEN>");
+        sign.update(true);
     }
     
     //Chest commands
-    public boolean doUpkeeping(){
-        chest.getInventory().remove(settings.getUpkeepStack());
-        return chest.update();
+    public void doUpkeeping(){
+        ChestUtil.removeInventoryItems(chest.getInventory(), settings.getUpkeepStack());
     }
     
     public boolean chestHasReqContent(){
-        return chest.getInventory().contains(settings.getMaterial());
+        return ChestUtil.hasInventoryReqContent(chest.getInventory(), settings.getUpkeepStack());
     }
     
     //Checkers
@@ -202,7 +207,7 @@ public class ExpensiveField {
     public void setFieldON(){
         field.setDisabled(false);
         //TODO debugcode
-        if(field.isDisabled())
+        if(!field.isDisabled())
             System.out.println("enabling succes");
         else
             System.out.println("enabling failed");
@@ -211,7 +216,7 @@ public class ExpensiveField {
     public void setFieldOFF(){
         field.setDisabled(true);
         //TODO debugcode
-        if(!field.isDisabled())
+        if(field.isDisabled())
             System.out.println("disabling succes");
         else
             System.out.println("disabling failed");

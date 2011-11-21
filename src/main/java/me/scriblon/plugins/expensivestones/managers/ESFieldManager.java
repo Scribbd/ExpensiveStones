@@ -123,6 +123,7 @@ public class ESFieldManager {
         }
         synchronized(this){
             final long id = field.getField().getId();
+            final boolean wasDormant = isInDormant(field.getField().getLocation());
             if(activeFields.containsKey(id)){
                 activeFields.remove(id);
                 ExpensiveStones.infoLog("(Disable)Field was active before. on ID: " + id);
@@ -138,8 +139,11 @@ public class ESFieldManager {
             
             field.setStatus(ESStorageManager.ES_DISABLED);
             field.setFieldOFF();
-            field.setSignToOff();
-            storage.offerStatusUpdate(field);
+            field.setSignToProgress();
+            if(wasDormant)
+                storage.offerUpdatedField(field);
+            else
+                storage.offerStatusUpdate(field);
         }       
     }
     
@@ -150,6 +154,7 @@ public class ESFieldManager {
         }
         synchronized(this){
             final long id = field.getField().getId();
+            final boolean wasDormant = isInDormant(field.getField().getLocation());
             if(dormantFields.containsKey(field.getField().getLocation())){
                 dormantFields.remove(field.getField().getLocation());
                 ExpensiveStones.infoLog("(Enable)Field was dormant before Enable. on ID: " + id);
@@ -166,7 +171,11 @@ public class ESFieldManager {
             field.setStatus(ESStorageManager.ES_ENABLED);
             field.setFieldON();
             field.setSignToOn();
-            storage.offerStatusUpdate(field);
+            setupUpKeeper(field);
+            if(wasDormant)
+                storage.offerUpdatedField(field);
+            else
+                storage.offerStatusUpdate(field);
         } 
     }
     
@@ -190,10 +199,11 @@ public class ESFieldManager {
             else
                 ExpensiveStones.infoLog("(Admin)Field was enabled before OP. (prob: signeditor) on ID: " + id);
             
+            field.setStatus(ESStorageManager.ES_DORMANT);
             field.setStatus(ESStorageManager.ES_ADMIN);
             field.setFieldON();
             field.setSignToOP();
-            storage.offerStatusUpdate(field);
+            storage.offerUpdatedField(field);
         }
     }
     
@@ -226,7 +236,7 @@ public class ESFieldManager {
     
     public void setupUpKeeper(ExpensiveField field){
         UpKeeper keeper = new UpKeeper(field);
-        this.setTask(keeper.scheduleMeFreeTick(), field);
+        this.setTask(keeper.scheduleMe(), field);
     }
     
     //Checkers
@@ -328,22 +338,28 @@ public class ESFieldManager {
         //TODO debugCode
         System.out.println("GetNonDormant(block) got a valid request!");
         long iD = stones.getForceFieldManager().getField(block).getId();
+        System.out.println("GetNonDormant(block) id test : " + iD);
         if(isKnownNonDormant(iD)){
-            if(!isInDisabled(iD))
-                return activeFields.get(iD);
-            else
+            System.out.println("GetNonDormant(block) Got a id-lock!");
+            if(isInDisabled(iD)){
+                System.out.println("GetNonDormant(block) Was disabled: " + disabledFields.get(iD));
                 return disabledFields.get(iD);
+            } else if(activeFields.containsKey(iD)) {
+                System.out.println("GetNonDormant(block) Was enabled");
+                return activeFields.get(iD);
+            }
         }
+        System.out.println("GetNonDormant(block): Still I haven't send any!");
         return null;
     }
     
     public ExpensiveField getExpensiveField(Block block){
+        System.out.println("GetExpField(Block): GetExp Request posted!");
         if(isInDormant(block.getLocation()))
             return getDormantField(block);
-        else if(stones.getForceFieldManager().isField(block)){
-            if(isKnownNonDormant(stones.getForceFieldManager().getField(block).getId())){
-                return getNonDormantField(block);
-            }
+        else if(isKnownNonDormant(stones.getForceFieldManager().getField(block).getId())){
+            System.out.println("GetExpField(Block): result isKnownDormant: " + stones.getForceFieldManager().getField(block).getId());
+            return getNonDormantField(block);
         }
         //TODO debugcode
         System.out.println("GetExpField(Block): No block selected!");

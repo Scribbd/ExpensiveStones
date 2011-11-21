@@ -120,10 +120,10 @@ public class ESStorageManager {
     
     public void offerStatusUpdate(ExpensiveField expField){
         long id = expField.getField().getId();
-        if(!pendingUpdates.containsKey(id))
-            pendingStatusMutations.put(expField.getField().getId(), expField.getStatus());
-        else
+        if(pendingUpdates.containsKey(id))
             pendingUpdates.put(expField.getField().getId(), expField);
+        else
+            pendingStatusMutations.put(expField.getField().getId(), expField.getStatus());
     }
     
     public void offerUpdatedField(ExpensiveField expField){
@@ -307,7 +307,7 @@ public class ESStorageManager {
             for(Entry single : pendingStatusMutations.entrySet()){
                 db.update("UPDATE `exstone_fields` "
                         + "SET `status` = " + single.getValue()
-                        + "WHERE `id` = " + single.getKey());
+                        + " WHERE `id` = " + single.getKey());
             }
             pendingStatusMutations.clear();
         }else{
