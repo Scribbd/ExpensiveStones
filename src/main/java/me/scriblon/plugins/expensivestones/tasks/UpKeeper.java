@@ -17,6 +17,8 @@ package me.scriblon.plugins.expensivestones.tasks;
 
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
+import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -40,6 +42,12 @@ public class UpKeeper implements Runnable{
     
     public void run() {
         System.out.println("Now keep up!");
+        // Check if field is dormanted
+        if(field.isDormant()){
+            System.out.println("(Upkeeper) field is dormant disabling myself on id : " + field.getField().getId());
+            this.stopMe();
+        }
+        
         // Check if field should be disabled
         if(field.isDisabled()){
             // Check if field was in disabled list
@@ -51,10 +59,13 @@ public class UpKeeper implements Runnable{
             field.setSignToOff();
             return;
         }
+        
+        final ESFieldManager manager = ExpensiveStones.getInstance().getESFieldManager();
+        
         // Check if chest is still there
         if(!field.getChestLocation().getBlock().getType().equals(Material.CHEST)){
             field.setError();
-            ExpensiveStones.getInstance().getESFieldManager().setDormantField(field);
+            manager.setDormantField(field);
             return;
         }
         
@@ -63,7 +74,7 @@ public class UpKeeper implements Runnable{
             field.doUpkeeping();
         }else{
             //Disable Field
-            ExpensiveStones.getInstance().getESFieldManager().disableField(field);
+            manager.disableField(field);
             //Change sign
             field.setSignToDepleted();
             //Cancel task 
@@ -72,6 +83,10 @@ public class UpKeeper implements Runnable{
                 this.stopMe();
             else
                 field.setError();
+            
+            System.out.println("(Upkeeper) Check if field is disabled to ES : " + field.isDisabled());
+            System.out.println("(Upkeeper) Check if field is disabled to PS : " + field.getField().isDisabled());
+            System.out.println("(Upkeeper) Check if field is still in list : " + PreciousStones.getInstance().getForceFieldManager().isField(field.getField().getBlock()));
         }
         
     }

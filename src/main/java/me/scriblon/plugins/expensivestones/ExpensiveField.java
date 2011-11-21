@@ -180,6 +180,7 @@ public class ExpensiveField {
     //Chest commands
     public void doUpkeeping(){
         ChestUtil.removeInventoryItems(chest.getInventory(), settings.getUpkeepStack());
+        chest.update();
     }
     
     public boolean chestHasReqContent(){
@@ -208,18 +209,18 @@ public class ExpensiveField {
         field.setDisabled(false);
         //TODO debugcode
         if(!field.isDisabled())
-            System.out.println("enabling succes");
+            System.out.println("(EnabelingField) enabling succes");
         else
-            System.out.println("enabling failed");
+            System.out.println("(EnabelingField) enabling failed");
     }
     
     public void setFieldOFF(){
         field.setDisabled(true);
         //TODO debugcode
         if(field.isDisabled())
-            System.out.println("disabling succes");
+            System.out.println("(DisabelingField) disabling succes");
         else
-            System.out.println("disabling failed");
+            System.out.println("(DisabelingField) disabling failed");
     }
     
     public boolean isFieldDisabled(){
