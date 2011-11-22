@@ -79,7 +79,7 @@ public class ExpensiveStones extends JavaPlugin {
         this.registerEvents(pm);
         this.registerCommands();
         // Register Saving thing
-        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new UpDater(eSStorageManager), 300L, 300L);
+        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new UpDater(), 300L, 300L);
         // Conclude
         infoLog("Load was succesfull!");
     }

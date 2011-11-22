@@ -86,7 +86,7 @@ public class Configurator {
         for(Entry<Long, ExpensiveField> field : fieldManager.getActiveFields().entrySet()){
             if(field.getValue().isAdmin()){
                 final UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
-                if(!fieldManager.setTask(keeper.scheduleMeFreeTick(), (ExpensiveField) field.getValue()))
+                if(!fieldManager.setTask(keeper.scheduleMeFreePeriod(), (ExpensiveField) field.getValue()))
                     keeper.stopMe();
             }
         }
