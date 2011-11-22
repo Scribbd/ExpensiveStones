@@ -30,6 +30,10 @@ import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * ExpensiveStones a plugin which adds upkeep cost to configured PreciousStones.
+ * Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
+ */
 public class ExpensiveStones extends JavaPlugin {
     
     private static final String prefix =  "[ExpensiveStones] ";
@@ -92,22 +96,42 @@ public class ExpensiveStones extends JavaPlugin {
         this.getCommand("es").setExecutor(esCommandEx);
     }
     
+    /**
+     * Logs an message on the Info-level.
+     * @param Message String with message
+     */
     public static void infoLog(String Message){
         log.log(Level.INFO, new StringBuilder().append(prefix).append(Message).toString());
     }
-
+    
+    /**
+     * Gives the fieldmanager linked to ExpensiveStones
+     * @return the FieldManger linked to ExpensiveStones
+     */
     public ESFieldManager getESFieldManager() {
         return eSFieldManager;
     }
-
+    
+    /**
+     * Gives the storagemanager linked to ExpensiveStones
+     * @return the StorageManager linked to ExpensiveStones
+     */
     public ESStorageManager getESStorageManager() {
         return eSStorageManager;
     }
     
+    /**
+     * Gets the logger
+     * @return the logger Logger
+     */
     public static Logger getLogger(){
         return log;
     }
     
+    /**
+     * Get an instance of this plugin
+     * @return ExpensiveStones plugin
+     */
     public static ExpensiveStones getInstance(){
         return expStones;
     }

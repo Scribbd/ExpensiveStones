@@ -29,7 +29,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
- * For adding, deletion and modification off fields.
+ * The FieldManager which manages the PreciousFields linked to this plugin.
  * @author 5894913
  */
 public class ESFieldManager {

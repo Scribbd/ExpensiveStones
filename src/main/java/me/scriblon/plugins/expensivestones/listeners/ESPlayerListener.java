@@ -19,7 +19,6 @@ import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
-import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -27,16 +26,14 @@ import org.bukkit.event.player.PlayerListener;
 
 /**
  *
- * @author Daan Meulenkamp
+ * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class ESPlayerListener extends PlayerListener{
         
-    private PreciousStones stones;
-    private ExpensiveStones plugin;
-    private ESFieldManager manager;
+    private final ExpensiveStones plugin;
+    private final ESFieldManager manager;
     
     public ESPlayerListener(){
-        stones = PreciousStones.getInstance();
         plugin = ExpensiveStones.getInstance();
         manager = plugin.getESFieldManager();
     }

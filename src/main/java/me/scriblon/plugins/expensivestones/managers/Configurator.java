@@ -28,7 +28,6 @@ import me.scriblon.plugins.expensivestones.tasks.UpKeeper;
 import me.scriblon.plugins.expensivestones.utils.Helper;
 import net.sacredlabyrinth.Phaed.PreciousStones.FieldSettings;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
-import net.sacredlabyrinth.Phaed.PreciousStones.managers.ForceFieldManager;
 import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -41,14 +40,13 @@ import org.bukkit.plugin.PluginManager;
  */
 public class Configurator {
     
-    private PluginManager pm;
-    private PreciousStones stones;
-    private ExpensiveStones plugin;
+    private final PluginManager pm;
+    private final PreciousStones stones;
+    private final ExpensiveStones plugin;
     
-    private ESStorageManager storageManager;
-    private ESFieldManager fieldManager;
-    private SettingsManager vanillaSettings;
-    private ForceFieldManager vanillaFieldManager;
+    private final ESStorageManager storageManager;
+    private final ESFieldManager fieldManager;
+    private final SettingsManager vanillaSettings;
     
     public Configurator(PluginManager pm){
         this.pm = pm;
@@ -59,7 +57,6 @@ public class Configurator {
         // PS Fields
         stones = PreciousStones.getInstance();
         vanillaSettings = stones.getSettingsManager();
-        vanillaFieldManager = stones.getForceFieldManager();
     }
     
     /**
@@ -82,13 +79,13 @@ public class Configurator {
             // Get known ExpensiveFields
         List<ExpensiveField> expensiveFields = this.getExpensiveFields();
         if(expensiveFields == null)
-            expensiveFields = Collections.EMPTY_LIST;
+            expensiveFields = Collections.emptyList();
         
         fieldManager.addFields(expensiveFields, false);
             // Schedule active Field Tasks
-        for(Entry field : fieldManager.getActiveFields().entrySet()){
-            if(((ExpensiveField) field).isAdmin()){
-                UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
+        for(Entry<Long, ExpensiveField> field : fieldManager.getActiveFields().entrySet()){
+            if(field.getValue().isAdmin()){
+                final UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
                 if(!fieldManager.setTask(keeper.scheduleMeFreeTick(), (ExpensiveField) field.getValue()))
                     keeper.stopMe();
             }
@@ -130,11 +127,6 @@ public class Configurator {
     
     public PreciousStones getPS(){
         return stones;
-    }
-    
-    private void logInfo(String message){
-        message = "[ExpensiveStone] " + message;
-        ExpensiveStones.infoLog(message);
     }
     
     private Material extractMaterial(LinkedHashMap<String, Object> stone){

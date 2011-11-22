@@ -304,7 +304,7 @@ public class ESStorageManager {
         if(pendingStatusMutations.isEmpty())
             return;
         if(db.checkConnection()){
-            for(Entry single : pendingStatusMutations.entrySet()){
+            for(Entry<Long, Integer> single : pendingStatusMutations.entrySet()){
                 db.update("UPDATE `exstone_fields` "
                         + "SET `status` = " + single.getValue()
                         + " WHERE `id` = " + single.getKey());
@@ -319,8 +319,8 @@ public class ESStorageManager {
         if(pendingUpdates.isEmpty())
             return;
         if(db.checkConnection()){
-            for(Entry single : pendingUpdates.entrySet()){
-                ExpensiveField field = (ExpensiveField) single.getValue();
+            for(Entry<Long, ExpensiveField> single : pendingUpdates.entrySet()){
+                final ExpensiveField field = single.getValue();
                 if(field.getStatus() == ES_DORMANT){
                     if(stones.getSettingsManager().isUseMysql()){
                         final Location fieldLocation = field.getField().getLocation();

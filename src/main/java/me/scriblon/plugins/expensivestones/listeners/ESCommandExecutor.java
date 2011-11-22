@@ -49,7 +49,7 @@ public class ESCommandExecutor implements CommandExecutor{
         }
                    
         Player player = (Player) sender;
-        boolean isAdmin = player.hasPermission("ExpensiveStones.admin");
+        final boolean isAdmin = player.hasPermission("ExpensiveStones.admin");
         //boolean is for special commands
         
         
