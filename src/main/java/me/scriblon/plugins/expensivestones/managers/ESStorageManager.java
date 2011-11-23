@@ -44,6 +44,7 @@ import org.bukkit.entity.Player;
  */
 public class ESStorageManager {
     
+	//TODO Subjected to be moved to ExpensiveField
     public static final int ES_DORMANT = -1;
     public static final int ES_DISABLED = 0;
     public static final int ES_ENABLED = 1;
@@ -58,15 +59,26 @@ public class ESStorageManager {
     private final Set<Long> pendingDeletions = Collections.synchronizedSet(new LinkedHashSet<Long>());
     private final Set<ExpensiveField> pendingAdditions = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>());
     
+    /**
+     * Constructor
+     */
     public ESStorageManager(){
         stones = PreciousStones.getInstance();
         db = DBFactory.produceDB();
     }
     
+    /**
+     * Checks if the ExpensiveField table is present in table
+     * @return true if table is present
+     */
     public boolean dbHasExpensive(){
         return db.existsTable("`exstone_fields`");
     }
     
+    /**
+     * Adds table to database.
+     * Subjected to be optimized
+     */
     public void addExpensiveTableToDatabase(){
         if(stones.getSettingsManager().isUseMysql()){
             ExpensiveStones.infoLog("Using MySQL to create table.");
@@ -114,10 +126,19 @@ public class ESStorageManager {
     }
     
     // Offers
+    /**
+     * Adds ExpensiveField to insertionChache
+     * @param expField Field to be added
+     */
     public void offerAddition(ExpensiveField expField){
         pendingAdditions.add(expField);
     }
     
+    /**
+     * Adds ExpensiveField to StatusUpdateChache
+     * Might be subjected to be removed
+     * @param expField Field of which the status has to be updated
+     */
     public void offerStatusUpdate(ExpensiveField expField){
         long id = expField.getField().getId();
         if(pendingUpdates.containsKey(id))
@@ -126,6 +147,10 @@ public class ESStorageManager {
             pendingStatusMutations.put(expField.getField().getId(), expField.getStatus());
     }
     
+    /**
+     * Adds ExpensiveField to whole update chase.
+     * @param expField Field to be updated as a whole
+     */
     public void offerUpdatedField(ExpensiveField expField){
         Long id = expField.getField().getId();
         if(pendingStatusMutations.containsKey(id))
@@ -133,23 +158,37 @@ public class ESStorageManager {
         pendingUpdates.put(id, expField);
     }
     
+    /**
+     * Adds ExpensiveField to whole deletion chase by the ExpensiveField
+     * Used by the importer
+     * @param expField Field to be deleted
+     */
+    public void offerDeletionByID(ExpensiveField expField){
+        pendingDeletions.add(expField.getField().getId());
+    }
+    
+    /**
+     * Adds ExpensiveField to whole deletion chase by id
+     * Subject to be refracted.
+     * @param expField Field to be deleted
+     */
+     private void offerDeletionOnId(Long id){
+    	 pendingDeletions.add(id);
+    }
+    
+    //TODO subjected to be removed
     public boolean checkWholeField(ExpensiveField expField){
         return pendingUpdates.containsKey(expField.getField().getId());
     }
     
-    /**
-     * 
-     * @param expField 
-     */
-    public void offerDeletion(ExpensiveField expField){
-        pendingDeletions.add(expField.getField().getId());
-    }
-    
-    private void offerDeletionOnLoad(Long id){
-        pendingDeletions.add(id);
-    }
-    
+
     // Executors
+    /**
+     * Gets the fields out of the database
+     * Subjected to be Optimized
+     * @param world String with the worldname
+     * @return List of ExpensiveFields
+     */
     public List<ExpensiveField> getExpensiveFields(String world){
         if(db.checkConnection()){
             List<ExpensiveField> fields = new ArrayList<ExpensiveField>();
@@ -209,7 +248,7 @@ public class ESStorageManager {
                             Location field = new Location(thisWorld, x, y, z);
                             if(PreciousStones.getInstance().getForceFieldManager().getField(field.getBlock()) == null){
                                 log.log(Level.SEVERE, " Database is invalid! Deletion Offered on ID: " + id);
-                                this.offerDeletionOnLoad(id);
+                                this.offerDeletionOnId(id);
                                 continue;
                             }
                             fields.add(new ExpensiveField(status, sign, chest, field));
@@ -231,7 +270,11 @@ public class ESStorageManager {
             return null;
         }
     }
-        
+    
+    /**
+     * Inserts the chace into the database
+     * Subjected to be optimized
+     */
     public void insertExpensiveField() {
         if(pendingAdditions.isEmpty())
             return;
@@ -286,6 +329,10 @@ public class ESStorageManager {
         }     
     }
     
+    /**
+     * Deletes all fields in chase.
+     * Subjected to be optimized
+     */
     public void deleteExpensiveField(){
         if(pendingDeletions.isEmpty())
             return;
@@ -300,6 +347,10 @@ public class ESStorageManager {
         }
     }
     
+    /**
+     * Push updates to the database. Only status will get updated.
+     * Subjected to be optimized
+     */
     public void updateStatus(){
         if(pendingStatusMutations.isEmpty())
             return;
@@ -315,6 +366,10 @@ public class ESStorageManager {
         }
     }
     
+    /**
+     * Push whole fields to the database.
+     * Subjected to be optimized
+     */
     public void updateField(){
         if(pendingUpdates.isEmpty())
             return;
@@ -387,6 +442,9 @@ public class ESStorageManager {
         }
     }
     
+    /**
+     * Pushes all changes to the database.
+     */
     public void saveAll(){
         synchronized(this){
             this.deleteExpensiveField();
@@ -396,6 +454,11 @@ public class ESStorageManager {
         }
     }
     
+    /**
+     * Drops the table
+     * !!Only use when you are sure to drop the table.
+     * @param sender Needs check of Player is in here.
+     */
     public void deïnstallPart(CommandSender sender){
         if(!(sender instanceof Player))
             return;

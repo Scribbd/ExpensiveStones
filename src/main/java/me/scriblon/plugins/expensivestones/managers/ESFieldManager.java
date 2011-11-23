@@ -48,23 +48,51 @@ public class ESFieldManager {
     //Debug
     private Map<Long, Long> taskLink = Collections.synchronizedMap(new LinkedHashMap<Long, Long>());
     
+    /**
+     * Constructor
+     */
     public ESFieldManager(){
         stones = PreciousStones.getInstance();
         storage = ExpensiveStones.getInstance().getESStorageManager();
     }
     
     //Settings related
+    /**
+     * Set the settings with a new batch
+     * @param settings Map with Integers and settings.
+     */
     public void setSettings(Map<Integer, ESFieldSettings> settings){
         this.settings.putAll(settings);
     }
     
-    public ESFieldSettings getESFieldSetting(int iD){
-        if(settings.containsKey(iD))
-            return settings.get(iD);
+    /**
+     * Gives the ExpensiveSettings of a typeId when pressent. Gives null when none is.
+     * @param typeID the blockID/typeID of the Material
+     * @return gives Settings associated with typeID, else it gives null
+     */
+    public ESFieldSettings getESFieldSetting(int typeID){
+        if(settings.containsKey(typeID))
+            return settings.get(typeID);
         return null;
     }
     
+    /**
+     * Checks if given itemID/blockID is known to be an ExpensiveStone
+     * @param typeID the itemID/blockID
+     * @return true if itemID/blockID is known as an ExpensiveStone
+     */
+    public boolean isExpensiveType(int typeID){
+        return settings.containsKey(typeID);
+    }
+    
+    
     //Adders
+    /**
+     * Adds a field to the list of known fields.
+     * Has option to push it to the database.
+     * @param field ExpensiveField 
+     * @param newField if given ExpensiveField is pushed to the database.
+     */
     public void addField(ExpensiveField field, boolean newField){
         final long id = field.getField().getId();
         if(field.isDisabled()){
@@ -92,6 +120,12 @@ public class ESFieldManager {
         }
     }
     
+    /**
+     * Adds a collection of fields to the list of known fields.
+     * Has option to push it to the database.
+     * @param field ExpensiveField 
+     * @param newField if given ExpensiveField is pushed to the database.
+     */
     public void addFields(List<ExpensiveField> fields, boolean newField){
         for(ExpensiveField field : fields){
             this.addField(field, newField);
@@ -99,6 +133,10 @@ public class ESFieldManager {
     }
     
     //Deleters
+    /**
+     * Removes field from known fields and pushes it to the database.
+     * @param field ExpensiveField 
+     */
     public void removeField(ExpensiveField field){
         synchronized(this){
             Long id = field.getField().getId();
@@ -111,11 +149,15 @@ public class ESFieldManager {
             //TODO debugCode
             if(activeFields.containsKey(id) || disabledFields.containsKey(id) || dormantFields.containsKey(field.getField().getLocation()))
                 System.out.println("Deletion Failed!");
-            storage.offerDeletion(field);
+            storage.offerDeletionByID(field);
         }
     }
     
     //Togglers
+    /**
+     * Disables field and pushes it to the database
+     * @param field ExpensiveField 
+     */
     public void disableField(ExpensiveField field){
         if(field.isAdmin()){
             ExpensiveStones.infoLog("(Disable)Field is Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
@@ -147,6 +189,10 @@ public class ESFieldManager {
         }       
     }
     
+    /**
+     * Enables field and pushes it to the database
+     * @param field ExpensiveField 
+     */
     public void enableField(ExpensiveField field){
         if(field.isAdmin()){
             ExpensiveStones.infoLog("(Enable)Field is Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
@@ -179,6 +225,10 @@ public class ESFieldManager {
         } 
     }
     
+    /**
+     * Sets field to admin and pushes it to the database
+     * @param field ExpensiveField 
+     */
     public void setAdminField(ExpensiveField field){
         if(field.isAdmin()){
             ExpensiveStones.infoLog("(Admin)Field is already Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
@@ -207,6 +257,10 @@ public class ESFieldManager {
         }
     }
     
+    /**
+     * Set the field to dormant and pushes it to the database.
+     * @param field ExpensiveField 
+     */
     public void setDormantField(ExpensiveField field){
         if(field.isAdmin()){
             ExpensiveStones.infoLog("(Dormant)Field is Admin. Handled by PreciousStones. on ID: " + field.getField().getId());
@@ -234,26 +288,50 @@ public class ESFieldManager {
         }
     }
     
+    /**
+     * Sets up keeper and starter of given field. Used by the enabler.
+     * @param field ExpensiveField 
+     */
     public void setupUpKeeper(ExpensiveField field){
         UpKeeper keeper = new UpKeeper(field);
         this.setTask(keeper.scheduleMe(), field);
     }
     
     //Checkers
+    /**
+     * Checks if fields is this given state.
+     * @param id long registered id on the database
+     * @return true if key is given type
+     */
     public boolean isInDisabled(long id){
         return disabledFields.containsKey(id);
     }
     
+    /**
+     * Checks if fields is this given state.
+     * @param id long registered id on the database
+     * @return true if key is given type
+     */
     public boolean isInDormant(Location location){
         return dormantFields.containsKey(location);
     }
     
+    /**
+     * Checks if fields is this given state.
+     * @param id long registered id on the database
+     * @return true if key is given type
+     */
     public boolean isKnownNonDormant(long id){
         if(disabledFields.containsKey(id) && activeFields.containsKey(id))
             ExpensiveStones.infoLog("(isKnown) Field found in both maps! on id: " + id);
         return disabledFields.containsKey(id) || activeFields.containsKey(id);
     }
     
+    /**
+     * Checks if field is known in the list (dormant and active)
+     * @param block Block to be tested against
+     * @return true if block is known to ExpesiveStones
+     */
     public boolean isKnown(Block block){
         if(isInDormant(block.getLocation()))
             return true;
@@ -267,10 +345,6 @@ public class ESFieldManager {
             }
         }
         return false;
-    }
-    
-    public boolean isExpensiveType(int type){
-        return settings.containsKey(type);
     }
     
     //Getters
@@ -322,9 +396,9 @@ public class ESFieldManager {
     }
     
     /**
-     * Gets Dormant Field, Null when not pressent.
-     * @param block
-     * @return 
+     * Gets Dormant Field, Null when none are present.
+     * @param block Block subjected for test
+     * @return ExpensiveField known to ExpensiveStones, and null if there isn't.
      */
     public ExpensiveField getDormantField(Block block){
         if(isInDormant(block.getLocation()))
@@ -332,6 +406,11 @@ public class ESFieldManager {
         return null;
     }
     
+    /**
+     * Get a nondormant field by block
+     * @param block the block to be tested against
+     * @return ExpensiveField known to ExpensiveStones, and null if there isn't.
+     */
     public ExpensiveField getNonDormantField(Block block){
         if(stones.getForceFieldManager().getField(block) == null)
             return null;
@@ -353,6 +432,11 @@ public class ESFieldManager {
         return null;
     }
     
+    /**
+     * Get a ExpensiveField by block. Known and dormant.
+     * @param block the block to be tested against
+     * @return ExpensiveField known to ExpensiveStones, and null if there isn't.
+     */
     public ExpensiveField getExpensiveField(Block block){
         System.out.println("GetExpField(Block): GetExp Request posted!");
         if(isInDormant(block.getLocation()))
@@ -366,11 +450,12 @@ public class ESFieldManager {
         return null;
     }
     
-    //!! debug feature Keeping track of all Tasks
+    //TODO DebugCode Subjected to be removed soon.
     public Map<Long, Long> getTaskLink() {
         return Collections.unmodifiableMap(taskLink);
     }
     
+
     public boolean setTask(long taskID, ExpensiveField field){
         long fieldID = field.getField().getId();
         if(!taskLink.containsKey(fieldID)){
@@ -381,6 +466,7 @@ public class ESFieldManager {
         return false;                    
     }
     
+
     public boolean removeTask(long taskID, ExpensiveField field){
         long fieldID = field.getField().getId();
         if(taskLink.containsKey(fieldID)){
@@ -390,7 +476,13 @@ public class ESFieldManager {
         ExpensiveStones.infoLog("(TaskCheck) Field was already removed! On ID: " + fieldID);
         return false;
     }
+    //End debugcode
     
+    /**
+     * Check if there are no fields present in any field.
+     * Subjected to be removed.
+     * @return true if all lists are empty
+     */
     public boolean isNonePresent(){
         return activeFields.isEmpty() && disabledFields.isEmpty() && dormantFields.isEmpty();
     }
