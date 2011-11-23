@@ -19,7 +19,7 @@ import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
-import org.bukkit.Material;
+
 import org.bukkit.block.Block;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -47,7 +47,7 @@ public class ESPlayerListener extends PlayerListener{
         //TODO debugcode
         System.out.println("ExpStone: interact event triggered.");
     //___Implementation on clicking sign
-        if(block.getType().equals(Material.SIGN) || block.getType().equals(Material.WALL_SIGN)){
+        if(block.getType().equals(BlockUtil.isSign(block))){
             //TODO debug
             System.out.println("SignInteract: Sign Interacted");
             final Block fieldBlock = BlockUtil.getFieldStone(block, false);
