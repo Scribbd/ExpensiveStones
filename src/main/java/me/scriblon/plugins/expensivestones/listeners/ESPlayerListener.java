@@ -47,7 +47,7 @@ public class ESPlayerListener extends PlayerListener{
         //TODO debugcode
         System.out.println("ExpStone: interact event triggered.");
     //___Implementation on clicking sign
-        if(block.getType().equals(BlockUtil.isSign(block))){
+        if(BlockUtil.isSign(block)){
             //TODO debug
             System.out.println("SignInteract: Sign Interacted");
             final Block fieldBlock = BlockUtil.getFieldStone(block, false);
