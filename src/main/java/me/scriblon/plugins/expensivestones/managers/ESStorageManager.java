@@ -44,6 +44,7 @@ import org.bukkit.entity.Player;
  */
 public class ESStorageManager {
     
+	//TODO Subjected to be moved to ExpensiveField
     public static final int ES_DORMANT = -1;
     public static final int ES_DISABLED = 0;
     public static final int ES_ENABLED = 1;
@@ -58,15 +59,26 @@ public class ESStorageManager {
     private final Set<Long> pendingDeletions = Collections.synchronizedSet(new LinkedHashSet<Long>());
     private final Set<ExpensiveField> pendingAdditions = Collections.synchronizedSet(new LinkedHashSet<ExpensiveField>());
     
+    /**
+     * Constructor
+     */
     public ESStorageManager(){
         stones = PreciousStones.getInstance();
         db = DBFactory.produceDB();
     }
     
+    /**
+     * Checks if the ExpensiveField table is present in table
+     * @return true if table is present
+     */
     public boolean dbHasExpensive(){
         return db.existsTable("`exstone_fields`");
     }
     
+    /**
+     * Adds table to database.
+     * Subjected to be optimized
+     */
     public void addExpensiveTableToDatabase(){
         if(stones.getSettingsManager().isUseMysql()){
             ExpensiveStones.infoLog("Using MySQL to create table.");
@@ -114,10 +126,19 @@ public class ESStorageManager {
     }
     
     // Offers
+    /**
+     * Adds ExpensiveField to insertionChache
+     * @param expField Field to be added
+     */
     public void offerAddition(ExpensiveField expField){
         pendingAdditions.add(expField);
     }
     
+    /**
+     * Adds ExpensiveField to StatusUpdateChache
+     * Might be subjected to be removed
+     * @param expField Field of which the status has to be updated
+     */
     public void offerStatusUpdate(ExpensiveField expField){
         long id = expField.getField().getId();
         if(pendingUpdates.containsKey(id))
@@ -126,6 +147,10 @@ public class ESStorageManager {
             pendingStatusMutations.put(expField.getField().getId(), expField.getStatus());
     }
     
+    /**
+     * Adds ExpensiveField to whole update chase.
+     * @param expField Field to be updated as a whole
+     */
     public void offerUpdatedField(ExpensiveField expField){
         Long id = expField.getField().getId();
         if(pendingStatusMutations.containsKey(id))
@@ -133,50 +158,53 @@ public class ESStorageManager {
         pendingUpdates.put(id, expField);
     }
     
+    /**
+     * Adds ExpensiveField to whole deletion chase by the ExpensiveField
+     * Used by the importer
+     * @param expField Field to be deleted
+     */
+    public void offerDeletionByID(ExpensiveField expField){
+        pendingDeletions.add(expField.getField().getId());
+    }
+    
+    /**
+     * Adds ExpensiveField to whole deletion chase by id
+     * Subject to be refracted.
+     * @param expField Field to be deleted
+     */
+     private void offerDeletionOnId(Long id){
+    	 pendingDeletions.add(id);
+    }
+    
+    //TODO subjected to be removed
     public boolean checkWholeField(ExpensiveField expField){
         return pendingUpdates.containsKey(expField.getField().getId());
     }
     
-    /**
-     * 
-     * @param expField 
-     */
-    public void offerDeletion(ExpensiveField expField){
-        pendingDeletions.add(expField.getField().getId());
-    }
-    
-    private void offerDeletionOnLoad(Long id){
-        pendingDeletions.add(id);
-    }
-    
+
     // Executors
+    /**
+     * Gets the fields out of the database
+     * Subjected to be Optimized
+     * @param world String with the worldname
+     * @return List of ExpensiveFields
+     */
     public List<ExpensiveField> getExpensiveFields(String world){
+        String query = "SELECT exstone_fields.id as id, "
+                + "status, "
+                + "chestx, chesty, chestz, "
+                + "signx, signy, signz, "
+                + "exstone_fields.world as world, "
+                + "x, y, z "
+                + "FROM exstone_fields ";
+        if(!stones.getSettingsManager().isUseMysql())
+            query = query + "INNER JOIN pstone_fields ON pstone_fields.id = exstone_fields.id ";
+        query = query + "WHERE world = '" + Helper.escapeQuotes(world) + "';";
+        
         if(db.checkConnection()){
             List<ExpensiveField> fields = new ArrayList<ExpensiveField>();
-            ResultSet res;
-            if(!stones.getSettingsManager().isUseMysql()){
-                ExpensiveStones.infoLog("Using MySQL to get table.");
-                res =  db.select("SELECT exstone_fields.id as id, "
-                        + "status, "
-                        + "chestx, chesty, chestz, "
-                        + "signx, signy, signz, "
-                        + "exstone_fields.world as world, "
-                        + "x, y, z "
-                        + "FROM exstone_fields "
-                        + "WHERE world = '" + Helper.escapeQuotes(world) + "';");
-                System.out.println(world);
-                ExpensiveStones.infoLog("Done using MySQL to get table.");
-            }else{
-                res =  db.select("SELECT pstone_fields.id as id, "
-                        + "status, "
-                        + "chestx, chesty, chestz, "
-                        + "signx, signy, signz, "
-                        + "pstone_fields.world as world, "
-                        + "x, y, z "
-                        + "FROM exstone_fields INNER JOIN pstone_fields ON pstone_fields.id = exstone_fields.id "
-                        + "WHERE world = '" + Helper.escapeQuotes(world) + "';");
+            ResultSet res =  db.select(query);
 
-            }
             if(res != null){
                 try{
                     while(res.next()){
@@ -209,7 +237,7 @@ public class ESStorageManager {
                             Location field = new Location(thisWorld, x, y, z);
                             if(PreciousStones.getInstance().getForceFieldManager().getField(field.getBlock()) == null){
                                 log.log(Level.SEVERE, " Database is invalid! Deletion Offered on ID: " + id);
-                                this.offerDeletionOnLoad(id);
+                                this.offerDeletionOnId(id);
                                 continue;
                             }
                             fields.add(new ExpensiveField(status, sign, chest, field));
@@ -231,54 +259,46 @@ public class ESStorageManager {
             return null;
         }
     }
-        
+    
+    /**
+     * Inserts the chace into the database
+     * Subjected to be optimized
+     */
     public void insertExpensiveField() {
         if(pendingAdditions.isEmpty())
             return;
+        
         if(db.checkConnection()){
+            final boolean useMySQL = stones.getSettingsManager().isUseMysql();
             for(ExpensiveField single: pendingAdditions){
-                //TODO debugCode
-                System.out.println(" `world` tester = " + Helper.escapeQuotes(single.getField().getWorld()));
-                if(single.isDormant()){
-                    if(stones.getSettingsManager().isUseMysql()){
-                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, `world` ) "
-                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
-                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');");
-                    } else {
-                        final Location fieldLocation = single.getField().getLocation();
-                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
-                                + "`x`, `y`, `z`, "
-                                + "`world` ) "
-                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
-                                + fieldLocation.getBlockX() + "," + fieldLocation.getBlockY() + "," + fieldLocation.getBlockZ() + ","
-                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');"); 
-                    }
-                } else {
-                    Location chest = single.getChestLocation();
-                    Location sign = single.getSignLocation();
-                    if(stones.getSettingsManager().isUseMysql()){
-                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
-                                + "`chestx`, `chesty`, `chestz`, "
-                                + "`signx`, `signy`, `signz`, "
-                                + "`world` ) "
-                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
-                                + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
-                                + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ","
-                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');");
-                    } else {
-                        final Location fieldLocation = single.getField().getLocation();
-                        db.insert("INSERT INTO `exstone_fields` ( `id`, `status`, "
-                                + "`chestx`, `chesty`, `chestz`, "
-                                + "`signx`, `signy`, `signz`, "
-                                + "`x`, `y`, `z`, "
-                                + "`world` ) "
-                            + "VALUES ( " + single.getField().getId() + "," + single.getStatus() + ","
-                                + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
-                                + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ() + ","
-                                + fieldLocation.getBlockX() + "," + fieldLocation.getBlockY() + "," + fieldLocation.getBlockZ() + ","
-                                + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "');"); 
-                    }
+                final boolean isDormant = single.isDormant();
+                //Build INSERTS
+                String query = "INSERT INTO `exstone_fields` ( `id`, `status`, `world`";
+                if(!isDormant)
+                    query = query + ", `chestx`, `chesty`, `chestz`, "
+                                + "`signx`, `signy`, `signz`, ";
+                if(!useMySQL)
+                    query = query + "`x`, `y`, `z`, ";
+                query = query + ") VALUES ( ";
+                //build VALUES
+                query = query + single.getField().getId() + "," + single.getStatus() + ","
+                    + "'" + Helper.escapeQuotes(single.getField().getWorld()) + "'";
+                if(!isDormant){
+                    final Location chest = single.getChestLocation();
+                    final Location sign = single.getSignLocation();
+                    query = query + ","
+                            + chest.getBlockX() + "," + chest.getBlockY() + "," + chest.getBlockZ() + ","
+                            + sign.getBlockX() + "," + sign.getBlockY() + "," + sign.getBlockZ();
                 }
+                if(!useMySQL){
+                    final Location field = single.getField().getLocation();
+                    query = query + ","
+                            + field.getBlockX() + "," + field.getBlockY() + "," + field.getBlockZ();
+                }
+                
+                query = query + "); ";
+                
+                db.insert(query);
             }
             pendingAdditions.clear();
         }else{
@@ -286,6 +306,10 @@ public class ESStorageManager {
         }     
     }
     
+    /**
+     * Deletes all fields in chase.
+     * Subjected to be optimized
+     */
     public void deleteExpensiveField(){
         if(pendingDeletions.isEmpty())
             return;
@@ -300,6 +324,10 @@ public class ESStorageManager {
         }
     }
     
+    /**
+     * Push updates to the database. Only status will get updated.
+     * Subjected to be optimized
+     */
     public void updateStatus(){
         if(pendingStatusMutations.isEmpty())
             return;
@@ -315,78 +343,58 @@ public class ESStorageManager {
         }
     }
     
+    /**
+     * Push whole fields to the database.
+     * Subjected to be optimized
+     */
     public void updateField(){
         if(pendingUpdates.isEmpty())
             return;
         if(db.checkConnection()){
             for(Entry<Long, ExpensiveField> single : pendingUpdates.entrySet()){
                 final ExpensiveField field = single.getValue();
-                if(field.getStatus() == ES_DORMANT){
-                    if(stones.getSettingsManager().isUseMysql()){
-                        final Location fieldLocation = field.getField().getLocation();
-                        db.update("UPDATE `exstone_fields` "
-                                + "SET `status` = NULL, "
-                                + "`chestx` = NULL, "
+                final boolean isDormant = field.isDormant();
+                final boolean useMySQL = stones.getSettingsManager().isUseMysql();
+                //Build start
+                String query = "UPDATE `exstone_fields` "
+                                + "SET `status` = " + field.getStatus() + ", ";
+                if(isDormant){
+                    query = query + "`chestx` = NULL, "
                                 + "`chesty` = NULL, "
                                 + "`chestz` = NULL, "
                                 + "`signx` = NULL, "
                                 + "`signy` = NULL, "
-                                + "`signz` = NULL, " 
-                                + "`x` = " + fieldLocation.getBlockX() + ", "
-                                + "`y` = " + fieldLocation.getBlockY() + ", "
-                                + "`z` = " + fieldLocation.getBlockZ() + ", "
-                                + "`world` = '" + field.getField().getWorld() + "' "
-                                + "WHERE `id` = " + single.getKey() + ";");
-                    }else{
-                        db.update("UPDATE `exstone_fields` "
-                                + "SET `status` = " + field.getStatus() + ","
-                                + "`chestx` = NULL, "
-                                + "`chesty` = NULL, "
-                                + "`chestz` = NULL, "
-                                + "`signx` = NULL, "
-                                + "`signy` = NULL, "
-                                + "`signz` = NULL, " 
-                                + "`world` = '" + field.getField().getWorld() + "' "
-                                + "WHERE `id` = " + single.getKey() + ";");
-                    }
-                } else {
+                                + "`signz` = NULL, "; 
+                }else{
                     Location chest = field.getChestLocation();
                     Location sign = field.getSignLocation();
-                    if(stones.getSettingsManager().isUseMysql()){
-                        final Location fieldLocation = field.getField().getLocation();
-                        db.update("UPDATE `exstone_fields` "
-                                + "SET `status` = " + field.getStatus() + ", "
-                                + "`chestx` = " + chest.getBlockX() + ", "
+                    query = query + "`chestx` = " + chest.getBlockX() + ", "
                                 + "`chesty` = " + chest.getBlockY() + ", "
                                 + "`chestz` = " + chest.getBlockZ() + ", "
                                 + "`signx` = " + sign.getBlockX() + ", "
                                 + "`signy` = " + sign.getBlockY() + ", "
-                                + "`signz` = " + sign.getBlockZ() + ", " 
-                                + "`x` = " + fieldLocation.getBlockX() + ", "
-                                + "`y` = " + fieldLocation.getBlockY() + ", "
-                                + "`z` = " + fieldLocation.getBlockZ() + ", "
-                                + "`world` = '" + field.getField().getWorld() + "' "
-                                + "WHERE `id` = " + single.getKey() + ";");
-                    }else{
-                        db.update("UPDATE `exstone_fields` "
-                                + "SET `status` = " + field.getStatus() + ", "
-                                + "`chestx` = " + chest.getBlockX() + ", "
-                                + "`chesty` = " + chest.getBlockY() + ", "
-                                + "`chestz` = " + chest.getBlockZ() + ", "
-                                + "`signx` = " + sign.getBlockX() + ", "
-                                + "`signy` = " + sign.getBlockY() + ", "
-                                + "`signz` = " + sign.getBlockZ() + ", "
-                                + "`world` = '" + field.getField().getWorld() + "' "
-                                + "WHERE `id` = " + single.getKey() + ";");
-                    }
+                                + "`signz` = " + sign.getBlockZ() + ", ";
                 }
+                if(!useMySQL){
+                    final Location fieldLocation = field.getField().getLocation();
+                    query = query + "`x` = " + fieldLocation.getBlockX() + ", "
+                                + "`y` = " + fieldLocation.getBlockY() + ", "
+                                + "`z` = " + fieldLocation.getBlockZ() + ", ";
+                }
+                
+                query = query + "`world` = '" + field.getField().getWorld() + "' "
+                                + "WHERE `id` = " + single.getKey() + ";";
+                db.update(query);
             }
             pendingUpdates.clear();
         }else{
-            ExpensiveStones.infoLog("Database Error, can`t connect! (deletion)");
+            ExpensiveStones.infoLog("Database Error, can`t connect! (update)");
         }
     }
     
+    /**
+     * Pushes all changes to the database.
+     */
     public void saveAll(){
         synchronized(this){
             this.deleteExpensiveField();
@@ -396,6 +404,11 @@ public class ESStorageManager {
         }
     }
     
+    /**
+     * Drops the table
+     * !!Only use when you are sure to drop the table.
+     * @param sender Needs check of Player is in here.
+     */
     public void deïnstallPart(CommandSender sender){
         if(!(sender instanceof Player))
             return;

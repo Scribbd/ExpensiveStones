@@ -18,22 +18,29 @@ package me.scriblon.plugins.expensivestones.tasks;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+
 import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 /**
- *
+ * A task for scheduling Fields for upkeeping.
+ * Can cancel itself if subjected chest is either broken or doesn't have the required contents. 
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class UpKeeper implements Runnable{
     
-    private JavaPlugin plugin;
-    private ExpensiveField field;
-    private BukkitScheduler scheduler;
+    final private ExpensiveStones plugin;
+    final private ExpensiveField field;
+    final private BukkitScheduler scheduler;
+    
     private int iD = -1;
     
+    /**
+     * A upkeeper for fields.
+     * @param ExpensiveField that gets scheduled.
+     */
     public UpKeeper(ExpensiveField field){
         this.field = field;
         plugin = ExpensiveStones.getInstance();
@@ -41,7 +48,14 @@ public class UpKeeper implements Runnable{
     }
     
     public void run() {
-        System.out.println("Now keep up!");
+        System.out.println("(Upkeeper) Now keeping up!");
+        // Check if field is still known
+        if(!PreciousStones.getInstance().getForceFieldManager().isField(field.getField().getBlock())){
+            field.setError();
+            this.stopMe();
+            return;
+        }
+        
         // Check if field is dormanted
         if(field.isDormant()){
             System.out.println("(Upkeeper) field is dormant disabling myself on id : " + field.getField().getId());
@@ -51,8 +65,8 @@ public class UpKeeper implements Runnable{
         // Check if field should be disabled
         if(field.isDisabled()){
             // Check if field was in disabled list
-            if(ExpensiveStones.getInstance().getESFieldManager().isInDisabled(field.getField().getId())){
-                ExpensiveStones.getInstance().getESFieldManager().disableField(field);
+            if(plugin.getESFieldManager().isInDisabled(field.getField().getId())){
+                plugin.getESFieldManager().disableField(field);
                 ExpensiveStones.infoLog("(UpKeeper) field was still on enabled list! On ID: " + field.getField().getId());
             }
             this.stopMe();
@@ -60,7 +74,7 @@ public class UpKeeper implements Runnable{
             return;
         }
         
-        final ESFieldManager manager = ExpensiveStones.getInstance().getESFieldManager();
+        final ESFieldManager manager = plugin.getESFieldManager();
         
         // Check if chest is still there
         if(!field.getChestLocation().getBlock().getType().equals(Material.CHEST)){
@@ -83,7 +97,7 @@ public class UpKeeper implements Runnable{
                 this.stopMe();
             else
                 field.setError();
-            
+            //TODO Subject to deletion
             System.out.println("(Upkeeper) Check if field is disabled to ES : " + field.isDisabled());
             System.out.println("(Upkeeper) Check if field is disabled to PS : " + field.getField().isDisabled());
             System.out.println("(Upkeeper) Check if field is still in list : " + PreciousStones.getInstance().getForceFieldManager().isField(field.getField().getBlock()));
@@ -91,19 +105,32 @@ public class UpKeeper implements Runnable{
         
     }
     
+    /**
+     * Schedules task with a 1-tick delay.
+     * @return long ID of scheduled task (-1 if task couldn't be scheduled)
+     */
     public long scheduleMe(){
         iD = this.scheduler.scheduleSyncRepeatingTask(plugin, this, 1L, field.getSettings().getUpkeepPeriod());
         return iD;
     }
     
-    public long scheduleMeFreeTick(){
+    /**
+     * Schedules tasks with one free period.
+     * Subject for change after removal ID-tracker.
+     * @return long iD of scheduled task (-1 if task couldn't be scheduled)
+     */
+    public long scheduleMeFreePeriod(){
         iD = this.scheduler.scheduleSyncRepeatingTask(plugin, this, 
                 field.getSettings().getUpkeepPeriod(), field.getSettings().getUpkeepPeriod());
         return iD;
     }
     
+    /**
+     * Stops the task by the known iD.
+     * Subject to change after removal ID-tracker.
+     */
     public void stopMe(){
         this.scheduler.cancelTask(iD);
-        ExpensiveStones.getInstance().getESFieldManager().removeTask(iD, field);
+        plugin.getESFieldManager().removeTask(iD, field);
     }
 }

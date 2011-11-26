@@ -79,14 +79,14 @@ public class ExpensiveStones extends JavaPlugin {
         this.registerEvents(pm);
         this.registerCommands();
         // Register Saving thing
-        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new UpDater(eSStorageManager), 300L, 300L);
+        this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new UpDater(), 300L, 300L);
         // Conclude
         infoLog("Load was succesfull!");
     }
     
     private void registerEvents(PluginManager pm){
         pm.registerEvent(Type.BLOCK_PLACE, esBlockListener, Priority.Highest, this);
-        pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Highest, this);
+        pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Normal, this);
         pm.registerEvent(Type.SIGN_CHANGE, esBlockListener, Priority.Normal, this);
         //pm.registerEvent(Type.REDSTONE_CHANGE, esBlockListener, Priority.Low, this);
         pm.registerEvent(Type.PLAYER_INTERACT, esPlayerListener, Priority.Normal, this);
