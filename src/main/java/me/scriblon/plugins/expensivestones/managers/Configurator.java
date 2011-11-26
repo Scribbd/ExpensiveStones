@@ -48,6 +48,10 @@ public class Configurator {
     private final ESFieldManager fieldManager;
     private final SettingsManager vanillaSettings;
     
+    /**
+     * Initiate for execution required.
+     * @param pm PluginManager from server
+     */
     public Configurator(PluginManager pm){
         this.pm = pm;
         // ES Fields
@@ -61,7 +65,7 @@ public class Configurator {
     
     /**
      * Main method to configure ExpensiveStones
-     * Loading progress
+     * Loading progress:
      * PS-Load>ES-check>ES-modify>ES-Schedule
      */
     public void configureStones(){
@@ -86,12 +90,16 @@ public class Configurator {
         for(Entry<Long, ExpensiveField> field : fieldManager.getActiveFields().entrySet()){
             if(field.getValue().isAdmin()){
                 final UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
-                if(!fieldManager.setTask(keeper.scheduleMeFreeTick(), (ExpensiveField) field.getValue()))
+                if(!fieldManager.setTask(keeper.scheduleMeFreePeriod(), (ExpensiveField) field.getValue()))
                     keeper.stopMe();
             }
         }
     }
     
+    /**
+     * Get the map of ItemIds/TypeIds combined with its corresponding ExpensiveFieldSettings.
+     * @return Map with TypeId as keys and FieldSettings as values.
+     */
     public Map<Integer, ESFieldSettings> getFieldSettings(){
         System.out.println("ExpensiveField starts detecting configured fields.");
         Map<Integer, ESFieldSettings> settings = new LinkedHashMap<Integer, ESFieldSettings>();
@@ -117,6 +125,10 @@ public class Configurator {
         return settings;
     }
     
+    /**
+     * A check if PreciousStones is available if loading queue starts this plugin without checking dependencies.
+     * @return true if PreciousStone is available.
+     */
     public boolean isPSAvailable(){
         final Plugin testPlugin = pm.getPlugin("PreciousStones");
         if(testPlugin != null)
@@ -125,6 +137,10 @@ public class Configurator {
             
     }
     
+    /**
+     * Gives the preciousStones plugin.
+     * @return PreciousStones instance
+     */
     public PreciousStones getPS(){
         return stones;
     }
@@ -140,6 +156,10 @@ public class Configurator {
         return ESFieldManager.STANDARD_MATERIAL;
     }
     
+    /**
+     * Extracts time from PreciousStones settings
+     * Subjected to be moved to an util-class
+     */
     private Long extractTime(LinkedHashMap<String, Object> stone){
         if(stone.containsKey("ExpensivePeriod")){
             if(Helper.isString(stone.get("ExpensivePeriod"))){
@@ -156,6 +176,10 @@ public class Configurator {
         return ESFieldManager.STANDARD_PERIOD;
     }
     
+    /**
+     * Extracts costs from PreciousStones settings
+     * Subjected to be moved to an util-class
+     */
     private int extractCost(LinkedHashMap<String, Object> stone){
         if(stone.containsKey("ExpensiveCost")){
             if(Helper.isInteger(stone.containsKey("ExpensiveCost")))
@@ -164,6 +188,9 @@ public class Configurator {
         return ESFieldManager.STANDARD_AMOUNT;
     }
     
+    /**
+     * Extracts List of ExpensiveFields from the database. world by world.
+     */
     private List<ExpensiveField> getExpensiveFields(){
         List<ExpensiveField> output = new ArrayList<ExpensiveField>();
         for(World world : plugin.getServer().getWorlds()){

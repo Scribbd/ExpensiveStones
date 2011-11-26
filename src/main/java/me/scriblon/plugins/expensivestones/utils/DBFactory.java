@@ -28,9 +28,13 @@ import net.sacredlabyrinth.Phaed.PreciousStones.storage.SQLiteCore;
  */
 public class DBFactory {
     
+	/**
+	 * Produces a Database Core with settings available from PreciousStones
+	 * @return DataBaseCore with available settings.
+	 */
     public static DBCore produceDB(){
-        PreciousStones stones = PreciousStones.getInstance();
-        SettingsManager pSettings = stones.getSettingsManager();
+        final PreciousStones stones = PreciousStones.getInstance();
+        final SettingsManager pSettings = stones.getSettingsManager();
         
         if(pSettings.isUseMysql()){
             return new MySQLCore(pSettings.getHost(), pSettings.getPort(), pSettings.getDatabase(), pSettings.getUsername(), pSettings.getPassword());

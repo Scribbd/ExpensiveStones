@@ -26,8 +26,9 @@ import org.bukkit.inventory.ItemStack;
 public class ChestUtil {
     /**
      * Credit goes to bergerkiller http://forums.bukkit.org/members/bergerkiller.96957/
-     * @param inv
-     * @param item 
+     * Removes itemstack from an inventory
+     * @param inv Inventory of target
+     * @param item Itemstack of what has to be removed
      */
     public static void removeInventoryItems(Inventory inv, ItemStack item) {
         removeInventoryItems(inv, item.getType(), item.getAmount());
@@ -35,13 +36,14 @@ public class ChestUtil {
     
     /**
      * Credit goes to bergerkiller http://forums.bukkit.org/members/bergerkiller.96957/
-     * @param inv
-     * @param type
-     * @param amount 
+     * Removes items from an inventory based on Material and an am amount
+     * @param inv Inventory of target
+     * @param type Material of required item
+     * @param amount Amount of required item
      */
     public static void removeInventoryItems(Inventory inv, Material type, int amount) {
         for (ItemStack is : inv.getContents()) {
-            if (is != null && is.getType() == type) {
+            if (is != null && is.getType().equals(type)) {
                 int newamount = is.getAmount() - amount;
                 if (newamount > 0) {
                     is.setAmount(newamount);
@@ -55,14 +57,27 @@ public class ChestUtil {
         }
     }
     
+    /**
+     * Checks if an inventory has the required contents by an ItemStack
+     * @param inv Inventory of target
+     * @param item Itemstack of required item
+     * @return true if required items are available
+     */
     public static boolean hasInventoryReqContent(Inventory inv, ItemStack item){
         return hasInventoryReqContent(inv, item.getType(), item.getAmount());
     }
     
+    /**
+     * Checks if an inventory has the required contents by MaterialType and amount
+     * @param inv Inventory of target
+     * @param type Material of required item
+     * @param amount Amount of required item
+     * @return true if required items are available
+     */
     public static boolean hasInventoryReqContent(Inventory inv, Material type, int amount){
         int total = 0;
         for(ItemStack is : inv.getContents()){
-            if (is != null && is.getType() == type) {
+            if (is != null && is.getType().equals(type)) {
                 total = +is.getAmount();
             }
             if(total >= amount){

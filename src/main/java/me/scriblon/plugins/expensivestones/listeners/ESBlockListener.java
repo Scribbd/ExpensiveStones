@@ -20,8 +20,8 @@ import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -102,11 +102,11 @@ public class ESBlockListener extends BlockListener{
         
         final Block block = event.getBlock();
         
-        if(!stones.getSettingsManager().isFieldType(event.getBlock()) && !(block.getType().equals(Material.SIGN) || block.getType().equals(Material.WALL_SIGN)))
+        if(!stones.getSettingsManager().isFieldType(event.getBlock()) && !BlockUtil.isSign(block))
             return;
         
         // SignCheck
-        if(block.getType().equals(Material.SIGN) || block.getType().equals(Material.WALL_SIGN)){
+        if(BlockUtil.isSign(block)){
             //TODO debugcode
             System.out.println("ExpStone: Signbreak event triggered");
             final Player player = event.getPlayer();
@@ -130,6 +130,8 @@ public class ESBlockListener extends BlockListener{
                 field.setFieldON();
             stones.getForceFieldManager().deleteField(field.getField());
             manager.removeField(field);
+            
+            event.getPlayer().sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is ready to be deleted.");
         }  
     }
 

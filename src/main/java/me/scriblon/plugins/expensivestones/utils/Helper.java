@@ -21,27 +21,48 @@ package me.scriblon.plugins.expensivestones.utils;
  */
 public class Helper {
     
+	/**
+	 * Tests and converts boolean.
+	 * @param o Object subjected to the test
+	 * @return either true if the object is boolean and contains a true, or false when it isn't.
+	 */
     public static boolean convertBoolean(Object o){
         if(o instanceof Boolean)
             return (Boolean) o;
         return false;
     }
     
+    /**
+     * Tests if object is an integer
+     * @param o Object subjected to the test
+     * @return true when object is integer
+     */
     public static boolean isInteger(Object o){
         return o instanceof Integer;
     }
     
+    /**
+     * Tests if object is a String
+     * @param o Object subjected to the test
+     * @return true when object is integer
+     */
     public static boolean isString(Object o){
         return o instanceof String;
     }
     
+    /**
+     * Converts integers to longs.
+     * @param v Integer to be converted
+     * @return the integer converted to long
+     */
     public static long convertInteger(int v){
         return (long) v;
     }
     
     /**
      * Escapes single quotes
-     * 1 on 1 copy of ExpensiveStones. Credits to their team.
+     * 1 on 1 copy of ExpensiveStones.
+     * Credits to the team of PreciousStones
      * @param str
      * @return
      */
@@ -53,11 +74,5 @@ public class Helper {
         }
         str = str.replace("'", "''");
         return str;
-    }
-    
-    public static String dropUnderscore(String str){
-        if(str == null)
-            return "";
-        return str.replaceAll("_", "");
     }
 }

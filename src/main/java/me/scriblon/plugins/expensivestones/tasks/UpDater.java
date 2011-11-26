@@ -15,23 +15,50 @@
  */
 package me.scriblon.plugins.expensivestones.tasks;
 
+import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 
+import org.bukkit.scheduler.BukkitScheduler;
+
 /**
- * For regular updating from the chace.
+ * For regular updating the database from the chase
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class UpDater implements Runnable{
     
     private final ESStorageManager storage;
+    private final ExpensiveStones plugin;
+    private final BukkitScheduler scheduler;
     
-    public UpDater(ESStorageManager storage){
-        this.storage = storage;
+    private int iD;
+    
+    /**
+     * Needs storage to function
+     * @param storage the ESStorageManager of ExpensiveStones
+     */
+    public UpDater(){
+    	this.plugin = ExpensiveStones.getInstance();
+        this.storage = plugin.getESStorageManager();
+        this.scheduler = plugin.getServer().getScheduler();
     }
             
     public void run() {
-        System.out.println("Now dating up!");
+        System.out.println("(Updating) Now dating up!");
             storage.saveAll();
+    }
+    
+    /**
+     * Schedules task with a 1-tick delay.
+     */
+    public void scheduleMe(){
+        iD = scheduler.scheduleSyncRepeatingTask(plugin, this, 300L, 300L);
+    }
+    
+    /**
+     * Stops the task by the known iD.
+     */
+    public void stopMe(){
+        scheduler.cancelTask(iD);
     }
     
 }
