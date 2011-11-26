@@ -43,7 +43,7 @@ public class UpDater implements Runnable{
     }
             
     public void run() {
-        System.out.println("Now dating up!");
+        System.out.println("(Updating) Now dating up!");
             storage.saveAll();
     }
     

@@ -48,7 +48,14 @@ public class UpKeeper implements Runnable{
     }
     
     public void run() {
-        System.out.println("Now keep up!");
+        System.out.println("(Upkeeper) Now keeping up!");
+        // Check if field is still known
+        if(!PreciousStones.getInstance().getForceFieldManager().isField(field.getField().getBlock())){
+            field.setError();
+            this.stopMe();
+            return;
+        }
+        
         // Check if field is dormanted
         if(field.isDormant()){
             System.out.println("(Upkeeper) field is dormant disabling myself on id : " + field.getField().getId());
