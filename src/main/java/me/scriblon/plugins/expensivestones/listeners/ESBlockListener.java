@@ -130,6 +130,8 @@ public class ESBlockListener extends BlockListener{
                 field.setFieldON();
             stones.getForceFieldManager().deleteField(field.getField());
             manager.removeField(field);
+            
+            event.getPlayer().sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is ready to be deleted.");
         }  
     }
 

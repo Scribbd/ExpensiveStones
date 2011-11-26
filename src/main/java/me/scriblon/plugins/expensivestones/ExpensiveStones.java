@@ -86,7 +86,7 @@ public class ExpensiveStones extends JavaPlugin {
     
     private void registerEvents(PluginManager pm){
         pm.registerEvent(Type.BLOCK_PLACE, esBlockListener, Priority.Highest, this);
-        pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Highest, this);
+        pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Normal, this);
         pm.registerEvent(Type.SIGN_CHANGE, esBlockListener, Priority.Normal, this);
         //pm.registerEvent(Type.REDSTONE_CHANGE, esBlockListener, Priority.Low, this);
         pm.registerEvent(Type.PLAYER_INTERACT, esPlayerListener, Priority.Normal, this);
