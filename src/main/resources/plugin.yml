@@ -6,7 +6,7 @@ generator: http://dinnerbone.com/minecraft/tools/pluginator/
 main: me.scriblon.plugins.expensivestones.ExpensiveStones
 name: ExpensiveStones
 startup: postworld
-version: '0.1'
+version: '0.1.2'
 depend: [PreciousStones]
 softdepend: [PreciousStones]
 commands:

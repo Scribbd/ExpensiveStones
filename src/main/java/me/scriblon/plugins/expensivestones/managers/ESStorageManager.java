@@ -197,7 +197,7 @@ public class ESStorageManager {
                 + "exstone_fields.world as world, "
                 + "x, y, z "
                 + "FROM exstone_fields ";
-        if(!stones.getSettingsManager().isUseMysql())
+        if(stones.getSettingsManager().isUseMysql())
             query = query + "INNER JOIN pstone_fields ON pstone_fields.id = exstone_fields.id ";
         query = query + "WHERE world = '" + Helper.escapeQuotes(world) + "';";
         

@@ -126,8 +126,8 @@ public class ESBlockListener extends BlockListener{
         // Check if block is known to ExpensiveField
         if(manager.isKnown(block)){
             final ExpensiveField field = manager.getExpensiveField(block);
-            if(manager.isInDormant(block.getLocation()))
-                field.setFieldON();
+            
+            field.setFieldON();
             stones.getForceFieldManager().deleteField(field.getField());
             manager.removeField(field);
             
