@@ -72,7 +72,7 @@ public class ESStorageManager {
      * @return true if table is present
      */
     public boolean dbHasExpensive(){
-        return db.existsTable("`exstone_fields`");
+        return db.existsTable("exstone_fields");
     }
     
     /**
@@ -87,11 +87,11 @@ public class ESStorageManager {
                     + "`id` bigint(20) NOT NULL, "
                     + "`status` tinyint NULL default 0, "
                     + "`chestx` int(11) default NULL, "
-                        + "`chesty` int(11) default NULL, "
-                        + "`chestz` int(11) default NULL, "
+                      + "`chesty` int(11) default NULL, "
+                      + "`chestz` int(11) default NULL, "
                     + "`signx` int(11) default NULL, "
-                        + "`signy` int(11) default NULL, "
-                        + "`signz` int(11) default NULL, "
+                      + "`signy` int(11) default NULL, "
+                      + "`signz` int(11) default NULL, "
                     + "`world` varchar(25) default NULL, "
                     + "CONSTRAINT pk_exst_dis PRIMARY KEY (`id`), "
                     + "CONSTRAINT uq_exst UNIQUE (`chestx`, `chesty`, `chestz`, `signx`, `signy`, `signz`, `world`) "
@@ -107,14 +107,14 @@ public class ESStorageManager {
                     + "`id` INTEGER PRIMARY KEY,  "
                     + "`status` int(2) NULL default NULL,  "
                     + "`chestx` int(11) default NULL,  "
-                        + "`chesty` int(11) default NULL,  "
-                        + "`chestz` int(11) default NULL,  "
+                      + "`chesty` int(11) default NULL,  "
+                      + "`chestz` int(11) default NULL,  "
                     + "`signx` int(11) default NULL,  "
-                        + "`signy` int(11) default NULL,  "
-                        + "`signz` int(11) default NULL,  "
+                      + "`signy` int(11) default NULL,  "
+                      + "`signz` int(11) default NULL,  "
                     + "`x` int(11) default NULL,  "
-                        + "`y` int(11) default NULL,  "
-                        + "`z` int(11) default NULL,  "
+                      + "`y` int(11) default NULL,  "
+                      + "`z` int(11) default NULL,  "
                     + "`world` varchar(25) default NULL,  "
                     + "CONSTRAINT uq_exst UNIQUE (`chestx`,`chesty`,`chestz`,`signx`,`signy`,`signz`,`x`,`y`,`z`,`world`) "
                         + ");");

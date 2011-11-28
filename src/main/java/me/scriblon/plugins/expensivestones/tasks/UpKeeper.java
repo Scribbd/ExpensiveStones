@@ -48,7 +48,6 @@ public class UpKeeper implements Runnable{
     }
     
     public void run() {
-        System.out.println("(Upkeeper) Now keeping up!");
         // Check if field is still known
         if(!PreciousStones.getInstance().getForceFieldManager().isField(field.getField().getBlock())){
             field.setError();
@@ -58,7 +57,6 @@ public class UpKeeper implements Runnable{
         
         // Check if field is dormanted
         if(field.isDormant()){
-            System.out.println("(Upkeeper) field is dormant disabling myself on id : " + field.getField().getId());
             this.stopMe();
         }
         
@@ -67,7 +65,6 @@ public class UpKeeper implements Runnable{
             // Check if field was in disabled list
             if(plugin.getESFieldManager().isInDisabled(field.getField().getId())){
                 plugin.getESFieldManager().disableField(field);
-                ExpensiveStones.infoLog("(UpKeeper) field was still on enabled list! On ID: " + field.getField().getId());
             }
             this.stopMe();
             field.setSignToOff();
@@ -97,10 +94,6 @@ public class UpKeeper implements Runnable{
                 this.stopMe();
             else
                 field.setError();
-            //TODO Subject to deletion
-            System.out.println("(Upkeeper) Check if field is disabled to ES : " + field.isDisabled());
-            System.out.println("(Upkeeper) Check if field is disabled to PS : " + field.getField().isDisabled());
-            System.out.println("(Upkeeper) Check if field is still in list : " + PreciousStones.getInstance().getForceFieldManager().isField(field.getField().getBlock()));
         }
         
     }
