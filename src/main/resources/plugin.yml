@@ -11,9 +11,9 @@ depend: [PreciousStones]
 softdepend: [PreciousStones]
 commands:
   ExpensiveStones:
-    description: The 
+    description: The main command for ES.
     aliases: [es, ExStones]
-    usage: Syntax error. Please use as follows /<command> [admin|bypass] when using admin add and id or 'point'    
+    usage: Syntax error. Please use as follows /<command> [admin|bypass|info] when using admin add and id or 'point'    
 permissions:
   ExpensiveStones.*:
     description: for the lazy-basterd who wants to get everything done in one go ;).
