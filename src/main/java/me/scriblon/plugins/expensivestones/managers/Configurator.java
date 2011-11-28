@@ -46,6 +46,7 @@ public class Configurator {
     
     private final ESStorageManager storageManager;
     private final ESFieldManager fieldManager;
+    private final ESPowerManager powerManager;
     private final SettingsManager vanillaSettings;
     
     /**
@@ -58,6 +59,7 @@ public class Configurator {
         plugin = ExpensiveStones.getInstance();
         storageManager = plugin.getESStorageManager();
         fieldManager = plugin.getESFieldManager();
+        powerManager = plugin.getESPowerManager();
         // PS Fields
         stones = PreciousStones.getInstance();
         vanillaSettings = stones.getSettingsManager();
@@ -86,9 +88,12 @@ public class Configurator {
             expensiveFields = Collections.emptyList();
         
         fieldManager.addFields(expensiveFields, false);
+        powerManager.addFieldBlocksCollection(fieldManager.getDisabledFields().values());
+        
             // Schedule active Field Tasks
         for(Entry<Long, ExpensiveField> field : fieldManager.getActiveFields().entrySet()){
             if(field.getValue().isAdmin()){
+                powerManager.addFieldBlocks(field.getValue());
                 final UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
                 if(!fieldManager.setTask(keeper.scheduleMeFreePeriod(), (ExpensiveField) field.getValue()))
                     keeper.stopMe();

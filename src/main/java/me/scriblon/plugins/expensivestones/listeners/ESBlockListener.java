@@ -18,6 +18,7 @@ package me.scriblon.plugins.expensivestones.listeners;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.ESPowerManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 
@@ -38,14 +39,16 @@ import org.bukkit.event.block.SignChangeEvent;
  */
 public class ESBlockListener extends BlockListener{
     
-    private PreciousStones stones;
-    private ExpensiveStones plugin;
-    private ESFieldManager manager;
+    private final PreciousStones stones;
+    private final ExpensiveStones plugin;
+    private final ESFieldManager fieldManager;
+    private final ESPowerManager powerManager;
     
     public ESBlockListener(){
         stones = PreciousStones.getInstance();
         plugin = ExpensiveStones.getInstance();
-        manager = plugin.getESFieldManager();
+        fieldManager = plugin.getESFieldManager();
+        powerManager = plugin.getESPowerManager();
     }
     
     
@@ -61,7 +64,7 @@ public class ESBlockListener extends BlockListener{
         final Block block = event.getBlock();
         final Player player = event.getPlayer();
         //Get a certein block.
-        final Block fieldBlock = BlockUtil.getFieldStone(block, false);
+        final Block fieldBlock = BlockUtil.getFieldStone(block, true);
         //Chech if any surrounding blocks is a known fieldblock.
         if(fieldBlock == null){
             player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: No Expensive StoneType Found.");
@@ -73,7 +76,7 @@ public class ESBlockListener extends BlockListener{
             if(!player.hasPermission("ExpensiveStones.admin")){
                 player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: You don't have the permissions to make an adminField.");
             }else{
-                manager.setAdminField(manager.getExpensiveField(block));                
+                fieldManager.setAdminField(fieldManager.getExpensiveField(block));                
                 player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Admin-Field created, field is now handled by PreciousStones.");
                 player.sendMessage(ChatColor.YELLOW + "You can now destroy this sign.");
             }
@@ -88,7 +91,7 @@ public class ESBlockListener extends BlockListener{
             return;
         }
         final ExpensiveField expField = new ExpensiveField(block, chestBlock, stones.getForceFieldManager().getField(fieldBlock));
-        manager.disableField(expField);
+        fieldManager.disableField(expField);
         event.setLine(1, expField.getField().getOwner());
         event.setLine(2, expField.getSettings().getMaterial().toString());
         event.setLine(3, "<DISABLED>");
@@ -118,18 +121,18 @@ public class ESBlockListener extends BlockListener{
                 return;
             }   
             //Get ExpensiveField and dormant it.
-            final ExpensiveField field = manager.getExpensiveField(fieldBlock);
-            manager.setDormantField(field);
+            final ExpensiveField field = fieldManager.getExpensiveField(fieldBlock);
+            fieldManager.setDormantField(field);
             player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is succesfully dormanted.");
             return;
         }
         // Check if block is known to ExpensiveField
-        if(manager.isKnown(block)){
-            final ExpensiveField field = manager.getExpensiveField(block);
+        if(fieldManager.isKnown(block)){
+            final ExpensiveField field = fieldManager.getExpensiveField(block);
             
             field.setFieldON();
             field.setError();
-            manager.removeField(field);
+            fieldManager.removeField(field);
             
             event.getPlayer().sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is ready to be deleted.");
         }  
@@ -144,7 +147,7 @@ public class ESBlockListener extends BlockListener{
         final Block block = event.getBlock();
         
         //Check if block in an ExpensiveType
-        if(!manager.isExpensiveType(block.getTypeId())) 
+        if(!fieldManager.isExpensiveType(block.getTypeId())) 
             return;
         //TODO debugcode
         System.out.println("Expst: stone is of type");
@@ -160,7 +163,7 @@ public class ESBlockListener extends BlockListener{
         
         //Add Field, will auto-dormant in creation of ExpensiveField
         ExpensiveField expField = new ExpensiveField(stones.getForceFieldManager().getField(block));
-        manager.addField(expField, true);
+        fieldManager.addField(expField, true);
         player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: stone detected! Stone is disabled.");
         player.sendMessage(ChatColor.YELLOW + "Place chest and sign to activate the field.");
     }
@@ -168,5 +171,29 @@ public class ESBlockListener extends BlockListener{
     @Override
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
         //When sign or chest is powered enable field when possible.
+        final Block block = event.getBlock();
+        //Check if the block is of the target powered type
+        if(!BlockUtil.isChest(block) && !BlockUtil.isSign(block))
+            return;
+        //Check if location is of interesting type
+        if(!powerManager.isLocationInteresting(block.getLocation()))
+            return;
+        //Check if location is of a known nondormant field (should be!)
+        final long iD = powerManager.getLinkedId(block);
+        if(!fieldManager.isKnownNonDormant(iD)){
+            ExpensiveStones.infoLog("POWERSYNC ERROR! assigned field blocks don't match powerSet!");
+            return;
+        }   
+        
+        //__Process Event!
+        final ExpensiveField field = fieldManager.getExpensiveField(iD);
+        if(powerManager.isBlockPowered(block)){
+            if(event.getOldCurrent() == 0){
+                fieldManager.enableField(field);
+                field.setSignToPowered();
+            }
+        } else {
+            fieldManager.disableField(field);
+        }
     }
 }

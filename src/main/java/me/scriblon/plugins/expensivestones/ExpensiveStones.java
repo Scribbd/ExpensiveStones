@@ -13,7 +13,6 @@
  *You should have received a copy of the GNU General Public License
  *along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package me.scriblon.plugins.expensivestones;
 
 import java.util.logging.Level;
@@ -23,6 +22,7 @@ import me.scriblon.plugins.expensivestones.listeners.ESBlockListener;
 import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
 import me.scriblon.plugins.expensivestones.listeners.ESPlayerListener;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.ESPowerManager;
 import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 import me.scriblon.plugins.expensivestones.tasks.UpDater;
 import org.bukkit.event.Event.Priority;
@@ -35,8 +35,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  * Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class ExpensiveStones extends JavaPlugin {
-    
-    private static final String prefix =  "[ExpensiveStones] ";
+
+    private static final String prefix = "[ExpensiveStones] ";
     private static final Logger log = Logger.getLogger("Minecraft");
     // Mine
     private static ExpensiveStones expStones;
@@ -47,7 +47,8 @@ public class ExpensiveStones extends JavaPlugin {
     // Managers
     private ESFieldManager eSFieldManager;
     private ESStorageManager eSStorageManager;
-    
+    private ESPowerManager eSPowerManager;
+
     public void onDisable() {
         eSStorageManager.saveAll();
         infoLog("is now disabled!");
@@ -58,19 +59,20 @@ public class ExpensiveStones extends JavaPlugin {
         expStones = this;
         // initialize Managers
         eSStorageManager = new ESStorageManager();
+        eSPowerManager = new ESPowerManager();
         eSFieldManager = new ESFieldManager();
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
         // Control dependencies
         Configurator config = new Configurator(pm);
-        if(!config.isPSAvailable()){
+        if (!config.isPSAvailable()) {
             infoLog("PreciousStones not available or disabled, disabling plugin!");
             pm.disablePlugin(this);
             return;
         }
         //Do the configuration
         config.configureStones();
-        
+
         // Initialize listeners and executors
         esBlockListener = new ESBlockListener();
         esPlayerListener = new ESPlayerListener();
@@ -83,27 +85,27 @@ public class ExpensiveStones extends JavaPlugin {
         // Conclude
         infoLog("Load was succesfull!");
     }
-    
-    private void registerEvents(PluginManager pm){
+
+    private void registerEvents(PluginManager pm) {
         pm.registerEvent(Type.BLOCK_PLACE, esBlockListener, Priority.Highest, this);
         pm.registerEvent(Type.BLOCK_BREAK, esBlockListener, Priority.Normal, this);
         pm.registerEvent(Type.SIGN_CHANGE, esBlockListener, Priority.Normal, this);
         //pm.registerEvent(Type.REDSTONE_CHANGE, esBlockListener, Priority.Low, this);
         pm.registerEvent(Type.PLAYER_INTERACT, esPlayerListener, Priority.Normal, this);
     }
-    
-    private void registerCommands(){
+
+    private void registerCommands() {
         this.getCommand("es").setExecutor(esCommandEx);
     }
-    
+
     /**
      * Logs an message on the Info-level.
      * @param Message String with message
      */
-    public static void infoLog(String Message){
+    public static void infoLog(String Message) {
         log.log(Level.INFO, new StringBuilder().append(prefix).append(Message).toString());
     }
-    
+
     /**
      * Gives the fieldmanager linked to ExpensiveStones
      * @return the FieldManger linked to ExpensiveStones
@@ -111,7 +113,7 @@ public class ExpensiveStones extends JavaPlugin {
     public ESFieldManager getESFieldManager() {
         return eSFieldManager;
     }
-    
+
     /**
      * Gives the storagemanager linked to ExpensiveStones
      * @return the StorageManager linked to ExpensiveStones
@@ -119,20 +121,24 @@ public class ExpensiveStones extends JavaPlugin {
     public ESStorageManager getESStorageManager() {
         return eSStorageManager;
     }
-    
+
+    public ESPowerManager getESPowerManager() {
+        return eSPowerManager;
+    }
+
     /**
      * Gets the logger
      * @return the logger Logger
      */
-    public static Logger getLogger(){
+    public static Logger getLogger() {
         return log;
     }
-    
+
     /**
      * Get an instance of this plugin
      * @return ExpensiveStones plugin
      */
-    public static ExpensiveStones getInstance(){
+    public static ExpensiveStones getInstance() {
         return expStones;
     }
 }

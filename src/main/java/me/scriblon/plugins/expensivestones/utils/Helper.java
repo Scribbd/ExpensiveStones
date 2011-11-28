@@ -59,6 +59,10 @@ public class Helper {
         return (long) v;
     }
     
+    public static boolean isLong(String s){
+        return !s.equals("[a-zA-Z]");
+    }
+    
     /**
      * Escapes single quotes
      * 1 on 1 copy of ExpensiveStones.
