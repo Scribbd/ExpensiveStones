@@ -450,6 +450,16 @@ public class ESFieldManager {
         return null;
     }
     
+    public ExpensiveField getExpensiveField(long iD){
+        if(isKnownNonDormant(iD)){
+            if(disabledFields.containsKey(iD))
+                return disabledFields.get(iD);
+            if(activeFields.containsKey(iD))
+                return activeFields.get(iD);               
+        }        
+        return null;
+    }
+    
     //TODO DebugCode Subjected to be removed soon.
     public Map<Long, Long> getTaskLink() {
         return Collections.unmodifiableMap(taskLink);
