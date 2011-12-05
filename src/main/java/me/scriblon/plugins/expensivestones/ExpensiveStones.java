@@ -44,6 +44,7 @@ public class ExpensiveStones extends JavaPlugin {
     private ESBlockListener esBlockListener;
     private ESPlayerListener esPlayerListener;
     private ESCommandExecutor esCommandEx;
+    private Configurator config;
     // Managers
     private ESFieldManager eSFieldManager;
     private ESStorageManager eSStorageManager;
@@ -57,14 +58,14 @@ public class ExpensiveStones extends JavaPlugin {
     public void onEnable() {
         infoLog("Starting to load!");
         expStones = this;
+        // Get basic information
+        final PluginManager pm = this.getServer().getPluginManager();
         // initialize Managers
         eSStorageManager = new ESStorageManager();
         eSPowerManager = new ESPowerManager();
         eSFieldManager = new ESFieldManager();
-        // Get basic information
-        final PluginManager pm = this.getServer().getPluginManager();
+        config = config = new Configurator(pm);
         // Control dependencies
-        Configurator config = new Configurator(pm);
         if (!config.isPSAvailable()) {
             infoLog("PreciousStones not available or disabled, disabling plugin!");
             pm.disablePlugin(this);
@@ -124,6 +125,10 @@ public class ExpensiveStones extends JavaPlugin {
 
     public ESPowerManager getESPowerManager() {
         return eSPowerManager;
+    }
+    
+    public Configurator getConfigurator(){
+        return config;
     }
 
     /**

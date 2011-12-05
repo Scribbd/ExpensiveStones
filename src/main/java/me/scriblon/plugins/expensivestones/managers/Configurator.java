@@ -16,11 +16,11 @@
 package me.scriblon.plugins.expensivestones.managers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import me.scriblon.plugins.expensivestones.ESFieldSettings;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
@@ -79,8 +79,10 @@ public class Configurator {
             ExpensiveStones.infoLog("ExpensiveStone Table pressent");
         }
         //Get data from ExpensiveStones-table to match other tables
+        Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(this.getFieldSettings());
+        fieldManager.setSettings(settings);
             // Get all ESFieldSettings defined in the PreciousStones config.yml
-        addFieldsToManager();
+        addDestinedFieldsToManager();
             // Schedule active Field Tasks
         activateDestinedFields();
         
@@ -128,16 +130,10 @@ public class Configurator {
     }
     
     private void activateDestinedFields(){
-        for(Entry<Long, ExpensiveField> field : fieldManager.getActiveFields().entrySet()){
-            if(!field.getValue().isAdmin()){
-                powerManager.addFieldBlocks(field.getValue());
-                final UpKeeper keeper = new UpKeeper(field.getValue());
-                keeper.scheduleMeFreePeriod();
-            }
-        }
+        activateFields(fieldManager.getActiveFields().values());
     }
     
-    public void activateFields(List<ExpensiveField> fields){
+    public void activateFields(Collection<ExpensiveField> fields){
         for(ExpensiveField field : fields){
             if(!field.isAdmin()){
                 powerManager.addFieldBlocks(field);
@@ -147,11 +143,11 @@ public class Configurator {
         }
     }
     
-    private void addFieldsToManager(){
-        Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(this.getFieldSettings());
-        fieldManager.setSettings(settings);
-            // Get known ExpensiveFields
-        List<ExpensiveField> expensiveFields = this.getExpensiveFields();
+    private void addDestinedFieldsToManager(){
+        addFieldsToManager(this.getExpensiveFields());
+    }
+    
+    public void addFieldsToManager(List<ExpensiveField> expensiveFields){
         if(expensiveFields == null)
             expensiveFields = Collections.emptyList();
         

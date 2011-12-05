@@ -7,7 +7,7 @@ package me.scriblon.plugins.expensivestones.listeners;
 import java.util.List;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
-import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.Configurator;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import org.bukkit.World;
 import org.bukkit.event.world.WorldListener;
@@ -35,11 +35,11 @@ public class ESWorldListener extends WorldListener{
         {
             return;
         }
-        //TODO make method in the right class
-        List<ExpensiveField> fields = plugin.getESStorageManager().getExpensiveFields(world.getName());
-        final ESFieldManager manager = plugin.getESFieldManager();
-        for(ExpensiveField field : fields)
-            ;
+
+        final List<ExpensiveField> fields = plugin.getESStorageManager().getExpensiveFields(world.getName());
+        final Configurator config = plugin.getConfigurator();
+        config.addFieldsToManager(fields);
+        config.activateFields(fields);
     }
     
     
