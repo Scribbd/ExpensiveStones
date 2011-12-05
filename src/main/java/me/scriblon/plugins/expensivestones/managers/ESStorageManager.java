@@ -276,9 +276,9 @@ public class ESStorageManager {
                 String query = "INSERT INTO `exstone_fields` ( `id`, `status`, `world`";
                 if(!isDormant)
                     query = query + ", `chestx`, `chesty`, `chestz`, "
-                                + "`signx`, `signy`, `signz`, ";
+                                + "`signx`, `signy`, `signz` ";
                 if(!useMySQL)
-                    query = query + "`x`, `y`, `z`, ";
+                    query = query + ", `x`, `y`, `z` ";
                 query = query + ") VALUES ( ";
                 //build VALUES
                 query = query + single.getField().getId() + "," + single.getStatus() + ","
