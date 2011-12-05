@@ -61,11 +61,11 @@ public class ESCommandExecutor implements CommandExecutor {
         Player player = (Player) sender;
         final boolean isAdmin = player.hasPermission("ExpensiveStones.admin");
         final boolean isInfo = player.hasPermission("ExpensiveStones.info");
+        final boolean isToggle = player.hasPermission("ExpensiveStones.bypass.toggle");
         //boolean is for special commands
 
         if (label.equalsIgnoreCase("info")) {
             if (isInfo) {
-
                 if (args[0].equalsIgnoreCase("point")) {
                     final Block block = player.getTargetBlock(null, 5);
                     if (manager.isKnown(block)) {
@@ -127,6 +127,12 @@ public class ESCommandExecutor implements CommandExecutor {
                     player.sendMessage(ChatColor.RED + "You don't have permission to do that!");
                     return true;
                 }
+            }
+        }
+        
+        if(label.equalsIgnoreCase("bypass")){
+            if(isToggle){
+                return true;
             }
         }
         return false;
