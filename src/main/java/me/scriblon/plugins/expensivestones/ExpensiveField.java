@@ -331,12 +331,6 @@ public class ExpensiveField {
      */
     public void setFieldON() {
         field.setDisabled(false);
-        // TODO debugcode
-        if (!field.isDisabled()) {
-            System.out.println("(EnabelingField) enabling succes");
-        } else {
-            System.out.println("(EnabelingField) enabling failed");
-        }
     }
 
     /**
@@ -344,12 +338,6 @@ public class ExpensiveField {
      */
     public void setFieldOFF() {
         field.setDisabled(true);
-        // TODO debugcode
-        if (field.isDisabled()) {
-            System.out.println("(DisabelingField) disabling succes");
-        } else {
-            System.out.println("(DisabelingField) disabling failed");
-        }
     }
 
     /**

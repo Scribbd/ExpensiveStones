@@ -58,6 +58,7 @@ public class UpKeeper implements Runnable{
         // Check if field is dormanted
         if(field.isDormant()){
             this.stopMe();
+            return;
         }
         
         // Check if field should be disabled
@@ -124,6 +125,5 @@ public class UpKeeper implements Runnable{
      */
     public void stopMe(){
         this.scheduler.cancelTask(iD);
-        plugin.getESFieldManager().removeTask(iD, field);
     }
 }

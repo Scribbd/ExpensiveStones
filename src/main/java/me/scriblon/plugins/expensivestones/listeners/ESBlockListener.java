@@ -110,14 +110,10 @@ public class ESBlockListener extends BlockListener{
         
         // SignCheck
         if(BlockUtil.isSign(block)){
-            //TODO debugcode
-            System.out.println("ExpStone: Signbreak event triggered");
             final Player player = event.getPlayer();
             final Block fieldBlock = BlockUtil.getFieldStone(block, false);
             //Check if fieldBlock has a known field
             if(fieldBlock == null){
-                //TODO debugcode
-                System.out.println("ExpStone: Couldn't find asked stone.");
                 return;
             }   
             //Get ExpensiveField and dormant it.
@@ -150,8 +146,6 @@ public class ESBlockListener extends BlockListener{
         //Check if block in an ExpensiveType
         if(!fieldManager.isExpensiveType(block.getTypeId())) 
             return;
-        //TODO debugcode
-        System.out.println("Expst: stone is of type");
         //Check if block is known to PreciousStone (did stone get registered there)
         if(!stones.getForceFieldManager().isField(block))
             return;
@@ -171,11 +165,11 @@ public class ESBlockListener extends BlockListener{
 
     @Override
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-        //When sign or chest is powered enable field when possible.
         final Block block = event.getBlock();
         //Check if the block is of the target powered type
         if(!BlockUtil.isChest(block) && !BlockUtil.isSign(block))
             return;
+        System.out.println("(PowerToggle) Found powered sign or chest.");
         //Check if location is of interesting type
         if(!powerManager.isLocationInteresting(block.getLocation()))
             return;
@@ -189,12 +183,13 @@ public class ESBlockListener extends BlockListener{
         //__Process Event!
         final ExpensiveField field = fieldManager.getExpensiveField(iD);
         if(powerManager.isBlockPowered(block)){
-            if(event.getOldCurrent() == 0){
+            if(field.isDisabled()){
                 fieldManager.enableField(field);
                 field.setSignToPowered();
             }
         } else {
-            fieldManager.disableField(field);
+            if(field.isActive())
+                fieldManager.disableField(field);
         }
     }
 }

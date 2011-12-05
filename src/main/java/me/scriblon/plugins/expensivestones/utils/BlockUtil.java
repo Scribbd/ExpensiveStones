@@ -94,8 +94,6 @@ public class BlockUtil {
             	return block;
         }
         //If everything fails!
-        //TODO debug
-        System.out.println("BlockUtil: No fieldblock found.");
         return null;
     }   
     
@@ -118,14 +116,7 @@ public class BlockUtil {
                     return true;
             } else {
                 if(isKnownField(block)){
-                    //TODO debug
-                    System.out.println("BlockUtil: found it!");
                     final ExpensiveField field = ExpensiveStones.getInstance().getESFieldManager().getExpensiveField(block);
-                    //TODO debugCode
-                    if(field == null)
-                        System.out.println("BlockUtil: field is null... while it shouldn't.");
-                    if(block == null)
-                        System.out.println("BlockUtil: stone is null... while it shouldn't.");
                     if(field.getField().getLocation().equals(block.getLocation())){
                         return true;
                     }

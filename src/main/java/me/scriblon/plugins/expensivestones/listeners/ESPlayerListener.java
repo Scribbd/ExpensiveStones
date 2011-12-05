@@ -44,12 +44,8 @@ public class ESPlayerListener extends PlayerListener{
             return;
                                                                                                                                             
         final Block block = event.getClickedBlock();
-        //TODO debugcode
-        System.out.println("ExpStone: interact event triggered.");
     //___Implementation on clicking sign
         if(BlockUtil.isSign(block)){
-            //TODO debug
-            System.out.println("SignInteract: Sign Interacted");
             final Block fieldBlock = BlockUtil.getFieldStone(block, false);
             //Check if valid block is given back
             if(fieldBlock == null){
@@ -62,11 +58,6 @@ public class ESPlayerListener extends PlayerListener{
             
             //Get ExpensiveField and process request
             final ExpensiveField field = manager.getExpensiveField(fieldBlock);
-            //TODO debug
-            if(field == null)
-                System.out.println("SignInteract: Field is null!");
-            else
-                System.out.println("SignInteract: Toggle field ID: " + field.getField().getId());
             this.toggleField(field);
             return;
         }
@@ -86,9 +77,6 @@ public class ESPlayerListener extends PlayerListener{
     }
     
     private void toggleField(ExpensiveField field){
-        //TODO debug
-        if(field == null)
-            System.out.println("ToggleField: field is null");
         if(manager.isInDisabled(field.getField().getId())){
             manager.enableField(field);
         } else {

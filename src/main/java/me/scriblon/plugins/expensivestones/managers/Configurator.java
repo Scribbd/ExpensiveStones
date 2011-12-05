@@ -80,25 +80,10 @@ public class Configurator {
         }
         //Get data from ExpensiveStones-table to match other tables
             // Get all ESFieldSettings defined in the PreciousStones config.yml
-        Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(this.getFieldSettings());
-        fieldManager.setSettings(settings);
-            // Get known ExpensiveFields
-        List<ExpensiveField> expensiveFields = this.getExpensiveFields();
-        if(expensiveFields == null)
-            expensiveFields = Collections.emptyList();
-        
-        fieldManager.addFields(expensiveFields, false);
-        powerManager.addFieldBlocksCollection(fieldManager.getDisabledFields().values());
-        
+        addFieldsToManager();
             // Schedule active Field Tasks
-        for(Entry<Long, ExpensiveField> field : fieldManager.getActiveFields().entrySet()){
-            if(field.getValue().isAdmin()){
-                powerManager.addFieldBlocks(field.getValue());
-                final UpKeeper keeper = new UpKeeper((ExpensiveField) field.getValue());
-                if(!fieldManager.setTask(keeper.scheduleMeFreePeriod(), (ExpensiveField) field.getValue()))
-                    keeper.stopMe();
-            }
-        }
+        activateDestinedFields();
+        
     }
     
     /**
@@ -142,12 +127,36 @@ public class Configurator {
             
     }
     
-    /**
-     * Gives the preciousStones plugin.
-     * @return PreciousStones instance
-     */
-    public PreciousStones getPS(){
-        return stones;
+    private void activateDestinedFields(){
+        for(Entry<Long, ExpensiveField> field : fieldManager.getActiveFields().entrySet()){
+            if(!field.getValue().isAdmin()){
+                powerManager.addFieldBlocks(field.getValue());
+                final UpKeeper keeper = new UpKeeper(field.getValue());
+                keeper.scheduleMeFreePeriod();
+            }
+        }
+    }
+    
+    public void activateFields(List<ExpensiveField> fields){
+        for(ExpensiveField field : fields){
+            if(!field.isAdmin()){
+                powerManager.addFieldBlocks(field);
+                final UpKeeper keeper = new UpKeeper(field);
+                keeper.scheduleMeFreePeriod();
+            }
+        }
+    }
+    
+    private void addFieldsToManager(){
+        Map<Integer, ESFieldSettings> settings = Collections.synchronizedMap(this.getFieldSettings());
+        fieldManager.setSettings(settings);
+            // Get known ExpensiveFields
+        List<ExpensiveField> expensiveFields = this.getExpensiveFields();
+        if(expensiveFields == null)
+            expensiveFields = Collections.emptyList();
+        
+        fieldManager.addFields(expensiveFields, false);
+        powerManager.addFieldBlocksCollection(fieldManager.getDisabledFields().values());
     }
     
     private Material extractMaterial(LinkedHashMap<String, Object> stone){

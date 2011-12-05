@@ -46,8 +46,6 @@ public class ESFieldManager {
     private final Map<Location, ExpensiveField> dormantFields = Collections.synchronizedMap(new LinkedHashMap<Location, ExpensiveField>());
     private final Map<Long, ExpensiveField> activeFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
     private final Map<Long, ExpensiveField> disabledFields = Collections.synchronizedMap(new LinkedHashMap<Long, ExpensiveField>());
-    //Debug
-    private final Map<Long, Long> taskLink = Collections.synchronizedMap(new LinkedHashMap<Long, Long>());
 
     /**
      * Constructor
@@ -153,10 +151,6 @@ public class ESFieldManager {
             }
             if (dormantFields.containsKey(field.getField().getLocation())) {
                 dormantFields.remove(field.getField().getLocation());
-            }
-            //TODO debugCode
-            if (activeFields.containsKey(id) || disabledFields.containsKey(id) || dormantFields.containsKey(field.getField().getLocation())) {
-                System.out.println("Deletion Failed!");
             }
             if (power.isFieldInteresting(field)) {
                 power.removeFieldBlocks(field);
@@ -324,7 +318,7 @@ public class ESFieldManager {
      */
     public void setupUpKeeper(ExpensiveField field) {
         UpKeeper keeper = new UpKeeper(field);
-        this.setTask(keeper.scheduleMe(), field);
+        keeper.scheduleMe();
     }
 
     //Checkers
@@ -369,8 +363,6 @@ public class ESFieldManager {
         }
         if (stones.getForceFieldManager().isField(block)) {
             final long id = stones.getForceFieldManager().getField(block).getId();
-            //TODO debug
-            System.out.println("IsKnown: debug long: " + id);
             if (isKnownNonDormant(id)) {
                 System.out.println("IsKnown: Got A field!");
                 return true;
@@ -449,8 +441,6 @@ public class ESFieldManager {
         if (stones.getForceFieldManager().getField(block) == null) {
             return null;
         }
-        //TODO debugCode
-        System.out.println("GetNonDormant(block) got a valid request!");
         long iD = stones.getForceFieldManager().getField(block).getId();
         System.out.println("GetNonDormant(block) id test : " + iD);
         if (isKnownNonDormant(iD)) {
@@ -480,8 +470,6 @@ public class ESFieldManager {
             System.out.println("GetExpField(Block): result isKnownDormant: " + stones.getForceFieldManager().getField(block).getId());
             return getNonDormantField(block);
         }
-        //TODO debugcode
-        System.out.println("GetExpField(Block): No block selected!");
         return null;
     }
 
@@ -496,32 +484,6 @@ public class ESFieldManager {
         }
         return null;
     }
-
-    //TODO DebugCode Subjected to be removed soon.
-    public Map<Long, Long> getTaskLink() {
-        return Collections.unmodifiableMap(taskLink);
-    }
-
-    public boolean setTask(long taskID, ExpensiveField field) {
-        long fieldID = field.getField().getId();
-        if (!taskLink.containsKey(fieldID)) {
-            taskLink.put(fieldID, taskID);
-            return true;
-        }
-        ExpensiveStones.infoLog("(TaskCheck) Field was already running! On ID: " + fieldID);
-        return false;
-    }
-
-    public boolean removeTask(long taskID, ExpensiveField field) {
-        long fieldID = field.getField().getId();
-        if (taskLink.containsKey(fieldID)) {
-            taskLink.remove(fieldID);
-            return true;
-        }
-        ExpensiveStones.infoLog("(TaskCheck) Field was already removed! On ID: " + fieldID);
-        return false;
-    }
-    //End debugcode
 
     /**
      * Check if there are no fields present in any field.
