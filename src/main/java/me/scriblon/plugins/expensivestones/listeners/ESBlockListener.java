@@ -131,9 +131,9 @@ public class ESBlockListener extends BlockListener{
             final ExpensiveField field = fieldManager.getExpensiveField(block);
             
             field.setFieldON();
-            if(!manager.isInDormant(field.getField().getLocation()))
+            if(!fieldManager.isInDormant(field.getField().getLocation()))
                 field.setError();
-            manager.removeField(field);
+            fieldManager.removeField(field);
             
             event.getPlayer().sendMessage(ChatColor.YELLOW + "ExpensiveStones: Field is ready to be deleted.");
         }  
