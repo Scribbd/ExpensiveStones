@@ -23,6 +23,7 @@ import me.scriblon.plugins.expensivestones.listeners.ESCommandExecutor;
 import me.scriblon.plugins.expensivestones.listeners.ESPlayerListener;
 import me.scriblon.plugins.expensivestones.listeners.ESWorldListener;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.ESPermissionManager;
 import me.scriblon.plugins.expensivestones.managers.ESPowerManager;
 import me.scriblon.plugins.expensivestones.managers.ESStorageManager;
 import me.scriblon.plugins.expensivestones.tasks.UpDater;
@@ -45,12 +46,13 @@ public class ExpensiveStones extends JavaPlugin {
     private ESBlockListener esBlockListener;
     private ESPlayerListener esPlayerListener;
     private ESCommandExecutor esCommandEx;
-    private ESWorldListener esWorldListener;
+    private ESWorldListener eSWorldListener;
     private Configurator config;
     // Managers
     private ESFieldManager eSFieldManager;
     private ESStorageManager eSStorageManager;
     private ESPowerManager eSPowerManager;
+    private ESPermissionManager eSPermissionManager;
 
     public void onDisable() {
         eSStorageManager.saveAll();
@@ -63,10 +65,11 @@ public class ExpensiveStones extends JavaPlugin {
         // Get basic information
         final PluginManager pm = this.getServer().getPluginManager();
         // initialize Managers
+        eSPermissionManager = new ESPermissionManager();
         eSStorageManager = new ESStorageManager();
         eSPowerManager = new ESPowerManager();
         eSFieldManager = new ESFieldManager();
-        esWorldListener = new ESWorldListener();
+        eSWorldListener = new ESWorldListener();
         config = config = new Configurator(pm);
         // Control dependencies
         if (!config.isPSAvailable()) {
@@ -96,7 +99,7 @@ public class ExpensiveStones extends JavaPlugin {
         pm.registerEvent(Type.SIGN_CHANGE, esBlockListener, Priority.Normal, this);
         pm.registerEvent(Type.REDSTONE_CHANGE, esBlockListener, Priority.Normal, this);
         pm.registerEvent(Type.PLAYER_INTERACT, esPlayerListener, Priority.Normal, this);
-        pm.registerEvent(Type.WORLD_LOAD, esWorldListener, Priority.Normal, this);
+        pm.registerEvent(Type.WORLD_LOAD, eSWorldListener, Priority.Normal, this);
     }
 
     private void registerCommands() {
@@ -133,6 +136,10 @@ public class ExpensiveStones extends JavaPlugin {
     
     public Configurator getConfigurator(){
         return config;
+    }
+    
+    public ESPermissionManager getESPermissionManager(){
+        return eSPermissionManager;
     }
 
     /**

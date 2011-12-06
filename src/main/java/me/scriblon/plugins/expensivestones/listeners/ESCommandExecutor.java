@@ -18,6 +18,7 @@ package me.scriblon.plugins.expensivestones.listeners;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.ESPermissionManager;
 import me.scriblon.plugins.expensivestones.utils.Helper;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -31,20 +32,31 @@ import org.bukkit.entity.Player;
  * @author Coen Meulenkamp (Scriblon, ~theJaf) <coenmeulenkamp at gmail.com>
  */
 public class ESCommandExecutor implements CommandExecutor {
+    
+    public static final String BASE = "ExpensiveStones";
+    
+    public static final String LABEL_INFO = "info";
+    public static final String LABEL_ADMIN = "admin";
+    public static final String LABEL_BYPASS = "bypass";
+    
+    public static final String ARG_POINT = "point";
+    public static final String ARG_TOGGLE = "toggle";
 
     final private ExpensiveStones stones;
     final private ESFieldManager manager;
+    final private ESPermissionManager permission;
 
     public ESCommandExecutor() {
         stones = ExpensiveStones.getInstance();
         manager = stones.getESFieldManager();
+        permission = stones.getESPermissionManager();
     }
 
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {        
         if (!(sender instanceof Player)) {
-            if (command.getName().equalsIgnoreCase("ExpensiveStones")) {
-                if (label.equals("prepareUninstall")) {
-                    if (args[0].equals("-a")) {
+            if (label.equalsIgnoreCase(BASE)) {
+                if (args[0].equals("prepareUninstall")) {
+                    if (args[1].equals("-a")) {
                         stones.getServer().getScheduler().cancelTasks(stones);
                         ExpensiveStones.infoLog("stopped all tasks related to ExpensiveFields!");
                         stones.getESStorageManager().deïnstallPart(sender);
@@ -59,14 +71,12 @@ public class ESCommandExecutor implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        final boolean isAdmin = player.hasPermission("ExpensiveStones.admin");
-        final boolean isInfo = player.hasPermission("ExpensiveStones.info");
-        final boolean isToggle = player.hasPermission("ExpensiveStones.bypass.toggle");
         //boolean is for special commands
 
-        if (label.equalsIgnoreCase("info")) {
+        if (args[0].equalsIgnoreCase(LABEL_INFO)) {
+            final boolean isInfo = player.hasPermission(ESPermissionManager.PERM_INFO);
             if (isInfo) {
-                if (args[0].equalsIgnoreCase("point")) {
+                if (args[1].equalsIgnoreCase(ARG_POINT)) {
                     final Block block = player.getTargetBlock(null, 5);
                     if (manager.isKnown(block)) {
                         final ExpensiveField field = manager.getExpensiveField(block);
@@ -76,8 +86,8 @@ public class ESCommandExecutor implements CommandExecutor {
                     }
                     return true;
 
-                } else if (Helper.isLong(args[0])) {
-                    final long iD = Long.parseLong(args[0]);
+                } else if (Helper.isLong(args[1])) {
+                    final long iD = Long.parseLong(args[1]);
                     final ExpensiveField field = manager.getKnownExpensiveFieldsByID().get(iD);
                     if (field != null) {
                         player.sendMessage(getInfo(field));
@@ -93,10 +103,10 @@ public class ESCommandExecutor implements CommandExecutor {
             }
         }
 
-        if (label.equalsIgnoreCase("admin")) {
+        if (args[0].equalsIgnoreCase(LABEL_ADMIN)) {
+            final boolean isAdmin = player.hasPermission(ESPermissionManager.PERM_ADMIN);
             if (isAdmin) {
-
-                if (args[0].equalsIgnoreCase("point")) {
+                if (args[1].equalsIgnoreCase(ARG_POINT)) {
                     final Block block = player.getTargetBlock(null, 5);
                     if (manager.isKnown(block)) {
                         final ExpensiveField field = manager.getExpensiveField(block);
@@ -110,8 +120,8 @@ public class ESCommandExecutor implements CommandExecutor {
                     }
                     return true;
 
-                } else if (Helper.isLong(args[0])) {
-                    final long iD = Long.parseLong(args[0]);
+                } else if (Helper.isLong(args[1])) {
+                    final long iD = Long.parseLong(args[1]);
                     final ExpensiveField field = manager.getKnownExpensiveFieldsByID().get(iD);
                     if (field != null) {
                         if(setAdmin(field))
@@ -130,9 +140,20 @@ public class ESCommandExecutor implements CommandExecutor {
             }
         }
         
-        if(label.equalsIgnoreCase("bypass")){
-            if(isToggle){
-                return true;
+        if(args[0].equalsIgnoreCase(LABEL_BYPASS) && args.length == 2){
+            if(args[1].equalsIgnoreCase(ARG_TOGGLE)){
+                final boolean isToggle = player.hasPermission(ESPermissionManager.PERM_BYPASS_TOGGLE);
+                if(isToggle){
+                    permission.toggleBypass(player);
+                    if(permission.bypassResult(player))
+                        player.sendMessage(ChatColor.YELLOW + "You are now bypassing ExpensiveStones.");
+                    else
+                        player.sendMessage(ChatColor.YELLOW + "You disabled the ExpensiveStones bypass.");
+                    return true;
+                } else {
+                    player.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+                    return true;
+                }
             }
         }
         return false;

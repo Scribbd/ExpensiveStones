@@ -60,7 +60,12 @@ public class Helper {
     }
     
     public static boolean isLong(String s){
-        return !s.equals("[a-zA-Z]");
+        try{
+            Long.parseLong(s);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
     
     /**

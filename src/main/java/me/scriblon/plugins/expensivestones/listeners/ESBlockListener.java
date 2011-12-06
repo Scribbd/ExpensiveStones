@@ -18,6 +18,7 @@ package me.scriblon.plugins.expensivestones.listeners;
 import me.scriblon.plugins.expensivestones.ExpensiveField;
 import me.scriblon.plugins.expensivestones.ExpensiveStones;
 import me.scriblon.plugins.expensivestones.managers.ESFieldManager;
+import me.scriblon.plugins.expensivestones.managers.ESPermissionManager;
 import me.scriblon.plugins.expensivestones.managers.ESPowerManager;
 import me.scriblon.plugins.expensivestones.utils.BlockUtil;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
@@ -43,12 +44,14 @@ public class ESBlockListener extends BlockListener{
     private final ExpensiveStones plugin;
     private final ESFieldManager fieldManager;
     private final ESPowerManager powerManager;
+    private final ESPermissionManager permissionManager;
     
     public ESBlockListener(){
         stones = PreciousStones.getInstance();
         plugin = ExpensiveStones.getInstance();
         fieldManager = plugin.getESFieldManager();
         powerManager = plugin.getESPowerManager();
+        permissionManager = plugin.getESPermissionManager();
     }
     
     
@@ -73,7 +76,7 @@ public class ESBlockListener extends BlockListener{
     //_____________________Test Adming_____________________________
         if(event.getLine(2).equalsIgnoreCase("admin")){
             //Check rights
-            if(!player.hasPermission("ExpensiveStones.admin")){
+            if(!player.hasPermission(ESPermissionManager.PERM_ADMIN)){
                 player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: You don't have the permissions to make an adminField.");
             }else{
                 fieldManager.setAdminField(fieldManager.getExpensiveField(block));                
@@ -151,7 +154,7 @@ public class ESBlockListener extends BlockListener{
             return;
         System.out.println("Expst: stone is a Field block.");
         //Do nothing when player has bypass permissions
-        if(player.hasPermission("ExpensiveStones.bypass")){
+        if(permissionManager.bypassResult(player)){
             player.sendMessage(ChatColor.YELLOW + "ExpensiveStones: Bypassed! Field handled by PreciousStones.");
             return;
         }

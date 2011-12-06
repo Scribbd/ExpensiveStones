@@ -17,12 +17,17 @@ commands:
 permissions:
   ExpensiveStones.*:
     description: for the lazy-basterd who wants to get everything done in one go ;).
+    default: false
     children:
       ExpensiveStones.admin: true
       ExpensiveStones.bypass: true
+      ExpensiveStones.bypass.toggle: true
   ExpensiveStones.admin:
     description: Player can place Admin-Fields.
     default: false
   ExpensiveStones.bypass:
     description: Player can toggle to a bypass state, letting all placed stones be handled by PreciousStones
-    defualt: false
+    default: false
+  ExpensiveStones.bypass.toggle:
+    description: Gives player the power to toggle its bypass state.
+    default: false
